@@ -2,311 +2,747 @@
 <html lang="zh-Hant">
 <head>
 <meta charset="UTF-8">
-<title>教學示範與練習 — 遙感探測與實習</title>
+<title>遙感探測與實習 — 特徵強化請作答</title>
 <style>
 * { box-sizing: border-box; }
-body { margin: 0; font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif; background: #0f1419; color: #e6e6e6; line-height: 1.7; }
-header { background: linear-gradient(135deg, #1a5a3a, #2c7c5a); padding: 18px 28px; border-bottom: 2px solid #4ab87e; position: sticky; top: 0; z-index: 100; box-shadow: 0 2px 12px rgba(0,0,0,0.5); }
-header h1 { margin: 0 0 6px 0; font-size: 22px; color: #fff; letter-spacing: 1px; }
-header .sub { font-size: 12px; color: #c5e6d0; margin-bottom: 8px; }
+body {
+  margin: 0;
+  font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+  background: #0f1419;
+  color: #e6e6e6;
+  line-height: 1.6;
+}
+header {
+  background: linear-gradient(135deg, #1a3a52, #2c5f7c);
+  padding: 18px 28px;
+  border-bottom: 2px solid #4a8db8;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.5);
+}
+header h1 {
+  margin: 0 0 10px 0;
+  font-size: 22px;
+  letter-spacing: 1px;
+  color: #fff;
+}
 nav { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
-nav a { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #d4e6f0; padding: 8px 16px; border-radius: 6px; font-size: 14px; text-decoration: none; display: inline-block; }
-nav a:hover { background: rgba(255,255,255,0.18); }
-main { display: grid; grid-template-columns: 280px 1fr; gap: 0; max-width: 1400px; margin: 0 auto; min-height: calc(100vh - 100px); }
-aside { background: #1a2530; border-right: 1px solid #2a3a4a; padding: 20px 0; }
-aside h3 { margin: 0 16px 8px 16px; color: #6bb6db; font-size: 12px; letter-spacing: 2px; text-transform: uppercase; }
-aside .lv-link { display: block; padding: 10px 16px; color: #b8d4e0; cursor: pointer; border-left: 3px solid transparent; font-size: 13px; transition: all .15s; }
-aside .lv-link:hover { background: #1f3040; color: #fff; }
-aside .lv-link.active { background: #1f3040; border-left-color: #4ab87e; color: #fff; font-weight: bold; }
-aside .quest-divider { margin: 16px 0 8px 0; padding: 8px 16px; background: #0f1a24; color: #6bb6db; font-size: 11px; letter-spacing: 2px; }
-.content { padding: 28px 36px; max-width: 900px; }
-h2 { color: #4ab87e; margin: 0 0 6px 0; }
-.lv-meta { color: #8aa5b5; font-size: 13px; margin-bottom: 20px; padding-bottom: 16px; border-bottom: 1px solid #2a3a4a; }
-.theory-box { background: rgba(74,141,184,0.10); border-left: 3px solid #6bb6db; padding: 14px 18px; margin: 16px 0; border-radius: 0 6px 6px 0; }
-.theory-box h4 { margin: 0 0 6px 0; color: #6bb6db; font-size: 13px; letter-spacing: 1px; }
-.step-card { background: #1a2530; border: 1px solid #2a3a4a; border-radius: 8px; padding: 20px 24px; margin: 14px 0; position: relative; transition: all .2s; }
-.step-card.current { border-color: #4ab87e; box-shadow: 0 0 16px rgba(74,184,126,0.15); }
-.step-card .num-badge { position: absolute; top: -12px; left: 16px; background: #4ab87e; color: #fff; font-size: 11px; padding: 3px 10px; border-radius: 12px; font-weight: bold; letter-spacing: 1px; }
-.step-card h4 { margin: 4px 0 8px 0; color: #c5e6d0; }
-.step-card .action { background: rgba(74,184,126,0.08); border-left: 3px solid #4ab87e; padding: 8px 14px; margin: 8px 0; border-radius: 0 4px 4px 0; font-size: 14px; color: #d4f0d0; }
-.step-card .expected { background: rgba(212,160,74,0.08); border-left: 3px solid #d4a04a; padding: 8px 14px; margin: 8px 0; border-radius: 0 4px 4px 0; font-size: 13px; color: #e5d0a8; }
-.step-card .why { background: rgba(107,182,219,0.06); border-left: 3px solid #6bb6db; padding: 8px 14px; margin: 8px 0; border-radius: 0 4px 4px 0; font-size: 12px; color: #b8d4e0; }
-.step-card code { background: #0a1218; color: #c5e6d0; padding: 2px 6px; border-radius: 3px; font-family: Consolas, monospace; font-size: 12px; }
-.btn-row { margin-top: 24px; display: flex; gap: 10px; flex-wrap: wrap; }
-.btn { background: #4ab87e; color: #fff; border: none; padding: 12px 22px; border-radius: 6px; cursor: pointer; font-size: 14px; text-decoration: none; display: inline-block; }
-.btn:hover { background: #5ec88c; }
-.btn.outline { background: transparent; border: 1px solid #4a8db8; color: #6bb6db; }
-.btn.outline:hover { background: rgba(107,182,219,0.1); }
-.answer-reveal { background: linear-gradient(135deg, #1a3a52, #2c5f7c); border-radius: 8px; padding: 16px 20px; margin-top: 18px; border: 1px dashed #6bb6db; }
-.answer-reveal summary { cursor: pointer; color: #6bb6db; font-weight: bold; outline: none; }
-.answer-reveal[open] summary { color: #4ab87e; }
-.answer-reveal .ans { margin-top: 12px; padding: 10px 14px; background: rgba(0,0,0,0.3); border-radius: 4px; color: #c5e6d0; font-family: Consolas, monospace; font-size: 13px; }
-.home-msg { text-align: center; padding: 60px 40px; color: #8aa5b5; }
-.home-msg h2 { color: #4ab87e; }
-.tag { display: inline-block; background: rgba(107,182,219,0.18); color: #9bd1eb; font-size: 11px; padding: 2px 8px; border-radius: 10px; margin-right: 4px; }
-.tag.cnn { background: rgba(138,74,184,0.2); color: #c5b6db; }
-.progress-bar { background: #0f1a24; height: 8px; border-radius: 4px; overflow: hidden; margin: 12px 0; }
-.progress-bar .fill { height: 100%; background: #4ab87e; transition: width .3s; }
-.flex-row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin: 10px 0; }
-footer { text-align: center; padding: 20px; color: #5a7080; font-size: 12px; border-top: 1px solid #2a3a4a; margin-top: 30px; }
+nav button, nav a.nav-link {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: #d4e6f0;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  text-decoration: none;
+  display: inline-block;
+}
+nav button:hover, nav a.nav-link:hover { background: rgba(255,255,255,0.18); }
+nav button.active { background: #4a8db8; border-color: #6bb6db; color: #fff; box-shadow: 0 0 12px rgba(107,182,219,0.4); }
+
+#userBar {
+  margin-left: auto;
+  color: #b8d4e0;
+  font-size: 13px;
+}
+#userBar .name { color: #fff; font-weight: bold; }
+#userBar .timer { color: #6bb6db; font-weight: bold; margin-left: 12px; }
+
+main { padding: 24px 28px; max-width: 1400px; margin: 0 auto; }
+section.page { display: none; animation: fade .25s ease; }
+section.page.active { display: block; }
+@keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+h2 { color: #6bb6db; border-bottom: 1px solid #2a4a5e; padding-bottom: 8px; }
+h3 { color: #9bd1eb; margin-top: 24px; }
+
+.panel {
+  background: #1a2530;
+  border: 1px solid #2a3a4a;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.panel h4 { margin: 0 0 12px 0; color: #9bd1eb; font-size: 14px; letter-spacing: 1px; text-transform: uppercase; }
+
+/* === 報到頁 === */
+.checkin {
+  max-width: 480px;
+  margin: 60px auto;
+  background: #1a2530;
+  border: 1px solid #2a4055;
+  border-radius: 12px;
+  padding: 40px;
+  text-align: center;
+}
+.checkin h2 { border: none; font-size: 24px; }
+.checkin input {
+  width: 100%;
+  background: #0f1a24;
+  border: 1px solid #2a4055;
+  color: #fff;
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-size: 15px;
+  margin: 8px 0;
+  font-family: inherit;
+}
+.checkin button {
+  width: 100%;
+  background: #4ab87e;
+  border: none;
+  color: #fff;
+  padding: 14px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 16px;
+}
+.checkin button:hover { background: #5ec88c; }
+.checkin button:disabled { background: #3a4a5a; cursor: not-allowed; }
+
+/* === 關卡卡片 === */
+.levels {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  margin: 20px 0;
+}
+.level-card {
+  background: #1a2530;
+  border: 2px solid #2a3a4a;
+  border-radius: 10px;
+  padding: 16px 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all .15s;
+  position: relative;
+}
+.level-card .ico { font-size: 32px; }
+.level-card .num { font-size: 11px; color: #6bb6db; font-weight: bold; letter-spacing: 2px; margin-top: 4px; }
+.level-card .title { font-size: 13px; color: #d4e6f0; margin-top: 4px; }
+.level-card .status { font-size: 10px; margin-top: 8px; padding: 3px 8px; border-radius: 10px; display: inline-block; }
+
+.level-card.locked { opacity: 0.4; cursor: not-allowed; border-color: #2a3a4a; }
+.level-card.locked .status { background: #2a3a4a; color: #8aa5b5; }
+
+.level-card.available { border-color: #4a8db8; }
+.level-card.available:hover { background: #1f3040; border-color: #6bb6db; transform: translateY(-2px); }
+.level-card.available .status { background: rgba(74,141,184,0.3); color: #9bd1eb; }
+
+.level-card.current { border-color: #d4a04a; box-shadow: 0 0 12px rgba(212,160,74,0.3); }
+.level-card.current .status { background: rgba(212,160,74,0.3); color: #d4a04a; }
+
+.level-card.done { border-color: #4ab87e; }
+.level-card.done .status { background: rgba(74,184,126,0.3); color: #4ab87e; }
+.level-card.done .ico::after { content: ' ✓'; color: #4ab87e; }
+
+/* === 關卡內容 === */
+.level-detail { margin-top: 24px; }
+.level-detail .theory {
+  background: rgba(74,141,184,0.08);
+  border-left: 4px solid #6bb6db;
+  padding: 16px 20px;
+  border-radius: 0 8px 8px 0;
+  margin-bottom: 16px;
+}
+.level-detail .theory h3 { margin-top: 0; }
+.challenge {
+  background: linear-gradient(135deg, #2a1a3a, #2a2a5a);
+  border: 2px solid #6b5acb;
+  border-radius: 10px;
+  padding: 20px;
+}
+.challenge h3 { color: #c5b5ff; margin-top: 0; }
+.challenge .goal {
+  background: rgba(107,90,203,0.15);
+  border-left: 3px solid #c5b5ff;
+  padding: 10px 16px;
+  margin-bottom: 16px;
+  border-radius: 0 4px 4px 0;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 20px;
+  margin-top: 12px;
+}
+
+.canvas-wrap {
+  background: #000;
+  border-radius: 8px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 200px;
+}
+canvas { display: block; max-width: 100%; height: auto; image-rendering: pixelated; }
+
+.control-row { margin-bottom: 14px; }
+.control-row label { display: block; font-size: 13px; color: #b8d4e0; margin-bottom: 4px; }
+.control-row .value { color: #6bb6db; font-weight: bold; margin-left: 6px; }
+input[type=range] { width: 100%; accent-color: #6bb6db; }
+select, input[type=text], input[type=number] {
+  width: 100%;
+  background: #0f1a24;
+  border: 1px solid #2a4055;
+  color: #e6e6e6;
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: inherit;
+}
+button.btn {
+  background: #4a8db8; border: none; color: #fff;
+  padding: 10px 16px; border-radius: 4px; cursor: pointer;
+  font-size: 13px; margin-right: 6px; margin-top: 4px;
+}
+button.btn:hover { background: #5ea1cc; }
+button.btn:disabled { background: #3a4a5a; cursor: not-allowed; }
+button.btn.success { background: #4ab87e; }
+button.btn.success:hover { background: #5ec88c; }
+button.btn.danger { background: #b85a4a; }
+button.btn.big { padding: 14px 30px; font-size: 15px; font-weight: bold; }
+
+.score-display {
+  font-size: 32px; text-align: center; padding: 16px;
+  border-radius: 8px; margin-top: 16px;
+  background: #0f1a24;
+}
+.score-display.pass { color: #4ab87e; background: rgba(74,184,126,0.15); border: 1px solid #4ab87e; }
+.score-display.almost { color: #d4a04a; background: rgba(212,160,74,0.15); border: 1px solid #d4a04a; }
+.score-display.fail { color: #b85a4a; background: rgba(184,90,74,0.15); border: 1px solid #b85a4a; }
+
+.hint {
+  background: rgba(212,160,74,0.1);
+  border-left: 3px solid #d4a04a;
+  padding: 10px 14px;
+  margin: 10px 0;
+  font-size: 13px;
+  border-radius: 0 4px 4px 0;
+  color: #e5d0a8;
+}
+
+.split-view {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* === 排行榜 === */
+.leaderboard {
+  background: #1a2530;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 16px;
+}
+.leaderboard table { width: 100%; border-collapse: collapse; }
+.leaderboard th { background: #1a3a52; padding: 12px 10px; text-align: left; color: #9bd1eb; font-size: 13px; }
+.leaderboard td { padding: 10px; border-top: 1px solid #2a3a4a; font-size: 13px; }
+.leaderboard tr.done td { background: rgba(74,184,126,0.05); }
+.leaderboard tr:hover td { background: rgba(107,182,219,0.08); }
+.lb-rank { font-weight: bold; color: #d4a04a; }
+.lb-rank.gold { color: #ffd700; }
+.lb-rank.silver { color: #c0c0c0; }
+.lb-rank.bronze { color: #cd7f32; }
+.lb-levels { font-family: monospace; letter-spacing: 1px; }
+
+/* === 設定頁 === */
+.setup-section {
+  background: #1a2530;
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+.setup-section h3 { margin-top: 0; }
+.setup-section ol { line-height: 1.8; }
+.setup-section code {
+  background: #0a1218; color: #9bd1eb;
+  padding: 2px 6px; border-radius: 3px; font-family: Consolas, monospace;
+}
+
+footer {
+  text-align: center; padding: 20px;
+  color: #5a7080; font-size: 12px;
+  border-top: 1px solid #2a3a4a; margin-top: 30px;
+}
+
+.notice {
+  background: rgba(184,90,74,0.12);
+  border-left: 3px solid #b85a4a;
+  padding: 12px 16px;
+  border-radius: 0 4px 4px 0;
+  margin: 12px 0;
+  color: #e5b3a8;
+}
+
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 8px;
+  margin: 12px 0;
+}
+.stat-box {
+  background: #0f1a24;
+  padding: 10px 14px;
+  border-radius: 6px;
+  border-left: 3px solid #6bb6db;
+}
+.stat-box .label { font-size: 11px; color: #8aa5b5; }
+.stat-box .val { font-size: 18px; color: #fff; font-weight: bold; }
+
+.warn-text { color: #d4a04a; font-size: 12px; margin-top: 4px; }
+
+.colorbar { height: 16px; border-radius: 4px; margin: 8px 0 4px 0; border: 1px solid #2a4055; }
+.colorbar-labels { display: flex; justify-content: space-between; font-size: 11px; color: #8aa5b5; }
 </style>
 </head>
 <body>
 
 <header>
-  <h1>📖 教學示範與練習</h1>
-  <div class="sub">遙感探測與實習 · 國立中興大學 森林學系 · 大Q · 10 關逐步引導</div>
+  <h1>🌳 遙感探測與實習 · 特徵強化請作答</h1>
+  <div style="font-size:12px;color:#9bd1eb;margin-bottom:8px">國立中興大學 森林學系 · 大三 · 授課老師：大Q</div>
   <nav>
-    <a href="../index.html">← 特徵強化（請作答）</a>
-    <a href="../cnn/index.html">CNN（請作答）</a>
-    <a href="../lab.html">🎮 練習園地</a>
+    <button class="nav-btn active" data-page="quest">📝 請作答</button>
+    <a class="nav-link" href="lab.html">🎮 練習園地</a>
+    <button class="nav-btn" data-page="leaderboard">🏅 排行榜</button>
+    <button class="nav-btn" data-page="setup">⚙️ 設定</button>
+    <div id="userBar"></div>
   </nav>
 </header>
 
 <main>
-  <aside id="sidebar"></aside>
-  <div class="content" id="content">
-    <div class="home-msg">
-      <h2>👈 從左側選一個關卡開始</h2>
-      <p>每關都有 <strong>5–7 個步驟</strong>，告訴你「做什麼、為什麼、預期看到什麼」。</p>
-      <p>上課老師可以照投影；學生可以同步操作另一個視窗的真實作答頁。</p>
-      <p style="margin-top:30px;color:#6bb6db">💡 建議搭配兩個視窗：一個開這頁，一個開作答頁。</p>
-    </div>
+
+<section id="page-quest" class="page active">
+  <div id="questContent"></div>
+</section>
+
+<section id="page-leaderboard" class="page">
+  <h2>🏅 排行榜</h2>
+  <p>所有同學的作答進度。完成者依完成時間排序；未完成依關卡數排序。</p>
+  <button class="btn" onclick="loadLeaderboard()">🔄 重新整理</button>
+  <div id="leaderboardContent" class="leaderboard">
+    <div style="padding:40px;text-align:center;color:#8aa5b5">點擊「重新整理」載入資料</div>
   </div>
+</section>
+
+<section id="page-setup" class="page">
+  <h2>⚙️ 設定</h2>
+
+  <div class="setup-section">
+    <h3>📡 Google Sheet Web App URL（老師設定一次）</h3>
+    <p>把 Apps Script 部署後得到的 URL 貼到下面，按儲存。所有同學使用同一個 URL。</p>
+    <input type="text" id="webAppUrl" placeholder="https://script.google.com/macros/s/AKfycb.../exec" style="font-family:monospace;font-size:12px">
+    <div style="margin-top:8px">
+      <button class="btn" onclick="saveWebAppUrl()">💾 儲存</button>
+      <button class="btn" onclick="testWebApp()">🔬 測試連線</button>
+    </div>
+    <div id="webAppStatus" style="margin-top:10px;font-size:13px"></div>
+  </div>
+
+  <div class="setup-section">
+    <h3>👤 本機資料</h3>
+    <div id="localState"></div>
+    <button class="btn danger" onclick="clearProgress()">🗑️ 清空本機進度（重新報到）</button>
+  </div>
+
+  <div class="setup-section">
+    <h3>📖 老師部署教學</h3>
+    <ol>
+      <li>打開 Google 試算表 → 上方功能表 <code>擴充功能 → Apps Script</code></li>
+      <li>已自動準備好「RS_FeatureEnhancement_Quest」專案，<strong>程式碼已貼好</strong></li>
+      <li>右上角點 <code>部署 → 新增部署作業</code></li>
+      <li>類型選 <code>網頁應用程式</code></li>
+      <li>說明任填、<strong>執行身分：我（你的 email）</strong>、<strong>存取權：任何人</strong></li>
+      <li>按「部署」→ 跳出授權視窗 → 選你的帳號 → <code>進階 → 前往 RS_FeatureEnhancement_Quest（不安全）</code> → <code>允許</code></li>
+      <li>複製給出的 <code>網頁應用程式 URL</code></li>
+      <li>貼回上方「Web App URL」欄位 → 按儲存</li>
+    </ol>
+    <div class="notice">⚠️ 第一次「進階 → 允許」是必要的，因為 Apps Script 需要存取你的試算表權限。完成後 URL 就可以給全班用。</div>
+  </div>
+</section>
+
 </main>
 
-<footer>遙感探測與實習 · 教學示範 · 大Q | 適合上課投影 + 課後練習</footer>
+<footer>
+  國立中興大學 森林學系 · 遙感探測與實習 · 大Q | 全部運算於瀏覽器本地進行
+</footer>
 
+<script src="assets.js"></script>
+<script src="core.js"></script>
 <script>
 // ============================================================
-// 全部 10 關的逐步教學
+// 全域狀態 + localStorage
 // ============================================================
-const LIVE_BASE = window.location.href.includes('github.io')
-  ? 'https://geoai-sustainability-lab.github.io/rs-feature-enhancement'
-  : '..';
+const STORAGE_KEY = 'rsfe_quest_v2';
+const DEFAULT_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyXtX_Z8bniRaOGWherLTAUpEDCxypUSIB9uWyR-OB6LvDAdIHmw2yIXiDj0t6UA5FUaw/exec';
+let APP = {
+  studentId: null,
+  studentName: null,
+  startTime: null,
+  webAppUrl: DEFAULT_WEBAPP_URL,
+  unlockedLevel: 1,
+  levelTimes: [null, null, null, null, null],
+  levelScores: [null, null, null, null, null],
+  levelStartTimes: [null, null, null, null, null],
+  currentLevel: null
+};
 
-const LESSONS = [
-  // ========== 特徵強化 quest ==========
-  {
-    id: 'fe-1', quest: 'feat_enh', tag: '特徵強化',
-    title: 'L1 — 植生指標：匹配目標遮罩',
-    icon: '🌱', time: '5 分鐘',
-    theory: 'NDVI = (NIR − R) / (NIR + R)。植物對紅光吸收強、近紅外反射強，所以植物的 NDVI 接近 +1。把 NDVI 大於某個門檻的像素視為「植被」，就能取得植被遮罩。',
-    answer: '門檻值 = 0.32',
-    steps: [
-      { title: '進到 L1 頁面', action: '在<strong>作答頁</strong>選 L1（植生指標）。', expected: '看到三張圖：NDVI 色階圖（參考）、你的遮罩（左）、目標遮罩（右）。', why: 'NDVI 色階圖讓你直覺看出植被分布；右側是要匹配的目標。' },
-      { title: '觀察目標遮罩', action: '盯著「目標」這張圖，估計綠色（白色像素）的比例。', expected: '目標看起來綠色佔大概 60% 左右（健康林地的合理範圍）。', why: '視覺估計後續才知道調太多還是太少。' },
-      { title: '調整門檻值', action: '左側拖滑桿，從預設 0.30 開始。把門檻越往左移，被認定為植被的越多（白越多）。', expected: '看著「你的遮罩」即時變化。', why: '門檻是判斷植被的關鍵閾值。NDVI 越高越像植被，所以門檻越低 = 認定越多像素為植被。' },
-      { title: '對比兩張遮罩', action: '比較「你的遮罩」與「目標」白色區域的差異。如果你的白色比目標多，門檻調高；少就調低。', expected: '兩張圖越來越像。', why: 'IoU（交集/聯集）會在你按提交時計算。' },
-      { title: '微調精準匹配', action: '當看起來差不多時，按 <code>📤 提交查看分數</code>。看到分數後再回頭微調。', expected: '分數逐步往上爬。', why: '提交才會顯示分數（避免直接看分數作弊調參）。' },
-      { title: '通關', action: '達到 IoU ≥ 65 (= 分數 65) 就過關。', expected: '🎉 訊息：「過關！分數 xx · 下一關已解鎖」。', why: '門檻已從原本的 80 降到 65，更友善。' }
-    ]
-  },
-  {
-    id: 'fe-2', quest: 'feat_enh', tag: '特徵強化',
-    title: 'L2 — 色彩空間：HSV 三軸調整',
-    icon: '🎨', time: '5 分鐘',
-    theory: 'RGB 不適合直接調「顏色強度」或「亮度」。轉成 HSV（色相 / 飽和度 / 明度）後，每個通道意義明確：H 是顏色種類、S 是純度、V 是亮度。',
-    answer: 'H = +30, S = 0.30, V = 0.80',
-    steps: [
-      { title: '進到 L2', action: '選 L2（色彩空間）。', expected: '看到原圖與目標圖並排，下方三個滑桿（H/S/V）。' },
-      { title: '觀察目標圖風格', action: '盯著目標。它看起來：顏色偏「橘黃」、整體較「淡」、亮度「中等」。', expected: '心裡有個方向。', why: 'H 位移代表色相旋轉、S 倍率代表飽和度乘上、V 倍率代表明度乘上。' },
-      { title: '調 H（色相位移）', action: '滑桿往「右」拉，讓綠色變黃橙（約 +30°）。', expected: '整張圖的顏色開始偏黃橙。' },
-      { title: '調 S（飽和度倍率）', action: '滑桿往「左」拉到約 0.30，讓顏色變淡。', expected: '圖變「淡淡的」、像褪色照片。' },
-      { title: '調 V（明度倍率）', action: '滑桿調到 0.80。', expected: '圖稍微變暗一點。' },
-      { title: '提交', action: '按 <code>📤 提交查看分數</code>。', expected: '分數應在 65+ 過關。', why: '相似度評估你的處理與目標的差異。' }
-    ]
-  },
-  {
-    id: 'fe-3', quest: 'feat_enh', tag: '特徵強化',
-    title: 'L3 — 形態學：流程匹配目標',
-    icon: '⬛', time: '6 分鐘',
-    theory: '形態學四大運算：膨脹（白變大）、侵蝕（白變小）、開運算（先侵蝕後膨脹，去雜點）、閉運算（先膨脹後侵蝕，填洞）。',
-    answer: 'Threshold = 110, 大小 = 5×5, 形狀 = 圓形, Op1 = 開運算, Op2 = 閉運算',
-    steps: [
-      { title: '進到 L3', action: '選 L3（形態學）。', expected: '看到你的二值化結果 vs 目標圖。' },
-      { title: '觀察目標', action: '盯著目標。注意：主體輪廓比原圖「平滑」、背景小雜點被「清除」、邊緣比較「圓潤」。', expected: '想到要用「開運算去雜點 + 閉運算填洞」。' },
-      { title: '設定 Threshold', action: '把 Threshold 滑桿調到 <strong>110</strong>。', expected: '主體被正確分割成白色。', why: '原圖很多深色細節，閾值太低會有太多白；太高會漏掉。110 剛好。' },
-      { title: '結構元設定', action: '大小 → <strong>5×5</strong>，形狀 → <strong>圓形</strong>。', expected: '看下方預覽顯示一個圓形結構元。', why: '圓形比方形邊緣更平滑、5×5 比 3×3 效果明顯。' },
-      { title: '運算順序', action: 'Op1 選「開運算」、Op2 選「閉運算」、Op3 留空。', expected: '結果開始接近目標。', why: '先開（去雜點）再閉（填洞）。順序反了效果差很多。' },
-      { title: '提交', action: '按提交，分數應 65+ 過關。', expected: '🎉' }
-    ]
-  },
-  {
-    id: 'fe-4', quest: 'feat_enh', tag: '特徵強化',
-    title: 'L4 — 濾波器：手寫 Sobel-Y',
-    icon: '🔲', time: '4 分鐘',
-    theory: '卷積 = 每個輸出像素 = 鄰近像素 × 卷積核值的加總 ÷ divisor + bias。不同的核做不同的事：均值=模糊、Sobel=邊緣、Laplacian=邊緣...',
-    answer: 'Kernel = [-1,-2,-1, 0,0,0, 1,2,1], Divisor = 1, Bias = 128',
-    steps: [
-      { title: '進到 L4', action: '選 L4（濾波器）。', expected: '看到 9 個 kernel 輸入格 + Divisor / Bias 滑桿 + 你的結果 / 目標 並排。' },
-      { title: '辨識目標效果', action: '盯著目標。它看起來像「邊緣偵測」，且強調「水平方向」。', expected: '想到 Sobel-Y。', why: 'Sobel-X 偵測垂直邊（左右變化），Sobel-Y 偵測水平邊（上下變化）。' },
-      { title: '填上排 kernel', action: '第一列填 <code>-1, -2, -1</code>。', expected: '上邊緣的權重為負。', why: 'Sobel-Y 設計：上方差負、下方差正，做加總就是上下變化量。' },
-      { title: '中間排與下排', action: '第二列全填 <code>0, 0, 0</code>，第三列填 <code>1, 2, 1</code>。', expected: '完整 9 格填好。' },
-      { title: 'Divisor 與 Bias', action: 'Divisor = <strong>1</strong>，Bias = <strong>128</strong>。', expected: '結果即時更新。', why: 'Bias 128 讓「零」變灰，正負差異各往黑白偏。' },
-      { title: '提交', action: '按提交，相似度應 65+ 過關。', expected: '🎉' }
-    ]
-  },
-  {
-    id: 'fe-5', quest: 'feat_enh', tag: '特徵強化',
-    title: 'L5 — HSL 葉色匹配',
-    icon: '🎯', time: '3 分鐘',
-    theory: 'HSL 跟 HSV 類似，但 L 是「最亮最暗的中點」，更直覺。植被的細微差異（嫩葉/老葉/枯葉/紅楓）就是不同的 HSL 值。',
-    answer: '動態（每次隨機）。提示會在 30 分鐘揭露目標 H/S/L 數值。',
-    steps: [
-      { title: '進到 L5', action: '選 L5（HSL 葉色匹配）。', expected: '看到隨機抽到的「目標葉色」與「你的調色」。' },
-      { title: '判斷顏色種類', action: '看目標葉子是綠、黃、紅還是混色？', expected: '心理估計 H 大致範圍。', why: 'H 100~140 = 綠、60~90 = 嫩黃綠、150~180 = 深綠帶藍、0~20 = 紅、30~60 = 黃橙。' },
-      { title: '先調 H', action: '左右拖 H 滑桿。先讓你的葉子的顏色種類對上。', expected: '兩片葉子顏色相近。' },
-      { title: '調 S', action: '飽和度 0% = 灰、100% = 最鮮豔。比對目標看你的太鮮還是太淡。', expected: '飽和度匹配。' },
-      { title: '調 L', action: 'L 50% = 中等亮度。比對看你的太亮還是太暗。', expected: '兩個葉子很接近。' },
-      { title: '提交', action: '按提交，匹配度 ≥ 65 過關。', expected: '🎉', why: '評分用 RGB 距離計算。' }
-    ]
-  },
-  // ========== CNN quest ==========
-  {
-    id: 'cnn-1', quest: 'cnn', tag: 'CNN',
-    title: 'L1 — Kernel & 卷積',
-    icon: '🟦', time: '6 分鐘',
-    theory: '卷積是 CNN 的基礎運算：用一個小矩陣（kernel）在影像上滑動，每個位置計算 kernel 與鄰近像素的加權和。不同 kernel = 不同特徵偵測器。',
-    answer: 'Kernel = [-1,-2,-1, 0,0,0, 1,2,1], Divisor = 1, Bias = 128',
-    steps: [
-      { title: '進到 L1', action: '在 <strong>CNN 作答頁</strong>選 L1。', expected: '看到 3 張圖（輸入 / 你的輸出 / 目標）+ 9 格 kernel 編輯器。' },
-      { title: '看「掃描動畫」', action: '點 <code>🎬 卷積掃描動畫</code>。', expected: '黃色框會逐格滑過輸入，你的輸出像被「畫」出來。', why: '這就是卷積的視覺化 — 看清楚每個位置怎麼算出輸出。' },
-      { title: '辨識目標效果', action: '盯著「目標」。它看起來像水平邊緣（上下變化）。', expected: '想到 Sobel-Y。' },
-      { title: '填 kernel', action: '第一列 <code>-1, -2, -1</code>、第二列 <code>0, 0, 0</code>、第三列 <code>1, 2, 1</code>。', expected: '你的輸出開始與目標相似。' },
-      { title: 'Divisor + Bias', action: 'Divisor = 1, Bias = 128。', expected: '輸出與目標幾乎一模一樣。', why: 'Bias 128 是為了把零值映射到 50% 灰，讓負值（變黑）與正值（變白）對稱顯示。' },
-      { title: '提交', action: '按提交，相似度 ≥ 65 過關。', expected: '🎉' }
-    ]
-  },
-  {
-    id: 'cnn-2', quest: 'cnn', tag: 'CNN',
-    title: 'L2 — 多 Kernel + Pooling',
-    icon: '🟧', time: '4 分鐘',
-    theory: '真實 CNN 在一層用多個 kernel 並行，產生多張 feature maps。Pooling 降解析度（max / avg）。輸出尺寸公式：(input + 2×padding − kernel) / stride 取下界 + 1。',
-    answer: '答案 = 7',
-    steps: [
-      { title: '進到 L2', action: '選 L2（多 Kernel + Pooling）。', expected: '看到 3 張圖：輸入、卷積後、Pooling 後。' },
-      { title: '玩切換 kernel', action: '左側下拉切換 4 種 kernel（Sobel-X / Sobel-Y / 均值 / 銳化）。', expected: '中間 feature map 即時變化。', why: '每個 kernel 提取不同特徵 — 同一張圖經過不同濾波器有完全不同的「視角」。' },
-      { title: '玩 Pooling', action: '改變 Pooling 大小（2-4）與類型（Max / Avg）。', expected: 'Pooling 後的圖明顯較小、較模糊。', why: 'Pooling 減少參數量、提升抗位移能力。' },
-      { title: '解計算題', action: '回到題目：32×32 → Conv(5×5, stride=2, padding=1) → Pool(2×2) = ?', expected: '心算或紙筆計算。', why: '輸出尺寸公式很重要 — 設計網路時要算出每層的尺寸。' },
-      { title: '套公式', action: '卷積：(32 + 2×1 − 5) / 2 + 1 = 29/2 + 1 → 14 + 1 = 15。然後 Pool 2×2：15 / 2 → 7。', expected: '答案 = 7。', why: '注意 stride 不是 1 時要取下界（floor）。' },
-      { title: '提交答案', action: '在「輸入一個整數」格子填 <strong>7</strong>，按提交。', expected: '100 分過關。', why: '差 1 給 75 分（仍過關）、差 ≤3 給 40 分。' }
-    ]
-  },
-  {
-    id: 'cnn-3', quest: 'cnn', tag: 'CNN',
-    title: 'L3 — Tiny CNN 權重傳遞',
-    icon: '🟪', time: '5 分鐘',
-    theory: '完整 CNN 管線：Input → Conv → ReLU → Pool → Flatten → Dense → 分類。本關用 8×8 input + 兩個固定的 conv kernel（一個偵測 X 對角、一個偵測 O 環形），學生只要調 Dense 層的 bias。',
-    answer: 'biasX = 0, biasO = 0 通常就過（kernel 已具判別力）',
-    steps: [
-      { title: '進到 L3', action: '選 L3（Tiny CNN）。', expected: '看到兩個 conv kernels（彩色色塊）+ 4 個測試樣本即時推論結果。' },
-      { title: '理解架構', action: '想像資料流向：8×8 input → 兩個 3×3 kernel → ReLU → MaxPool 2×2 → Flatten → 2 個輸出（X / O）。', expected: '心中有架構圖。' },
-      { title: '看 K1 與 K2', action: 'K1（X 偵測）是棋盤花紋；K2（O 偵測）是相反。', expected: 'X 樣本經 K1 反應強、經 K2 反應弱。', why: '這就是 CNN 的核心：不同 kernel 對不同形狀有不同反應。' },
-      { title: '檢查樣本分類', action: '看 4 個樣本的「真實 vs 預測」，左下角綠色 / 紅色邊框代表對 / 錯。', expected: '預設情況下（bias 都 0）可能已經全對了！' },
-      { title: '若有錯，微調 bias', action: '看哪個樣本錯了，往「讓正確類別 logit 變大」的方向調。例：X 樣本預測為 O，把 biasX 往正調。', expected: '錯誤的樣本變對。' },
-      { title: '提交', action: '4/4 = 100、3/4 = 80（仍過關）、2/4 = 50。按提交。', expected: '🎉', why: '這已經是完整 CNN 的訓練 — 只是這裡只訓練最後一層而已。' }
-    ]
-  },
-  {
-    id: 'cnn-4', quest: 'cnn', tag: 'CNN',
-    title: 'L4 — MobileNet 影像分類',
-    icon: '🤖', time: '4 分鐘',
-    theory: 'MobileNet 是一個訓練好的真實 CNN 模型，能辨識 1000 個 ImageNet 類別。我們透過 TensorFlow.js 直接在瀏覽器執行 — 完全本地、不需後端。',
-    answer: '點第 2 張（forest 森林場景）',
-    steps: [
-      { title: '進到 L4', action: '選 L4（MobileNet）。等待約 10-15 秒下載模型（~10 MB）。', expected: '看到 6 張合成場景圖。', why: '首次載入會慢；之後快取。' },
-      { title: '逐張試', action: '依序點 6 張圖：山、森林、海邊、房子、花田、湖。', expected: '每張圖都會即時顯示 Top-5 預測 + 信心。', why: '看看真實模型怎麼「看」這些場景。' },
-      { title: '注意預測類別', action: '注意每個預測的英文類別名稱（如 alp、forest、seashore、tree...）。', expected: '森林那張包含「forest」相關詞。' },
-      { title: '找符合的圖', action: '挑出 Top-5 包含「tree、forest、wood、plant、leaf、park、alp、mountain」的圖。', expected: '森林（第 2 張）最有可能滿足。', why: '本關放寬：只要相關詞出現就部分得分。' },
-      { title: '提交', action: '挑到符合的圖後按提交。', expected: '🎉 100 分（包含相關詞 + 信心 ≥0.05）或 70 分（只部分匹配）。' }
-    ]
-  },
-  {
-    id: 'cnn-5', quest: 'cnn', tag: 'CNN',
-    title: 'L5 — 物件偵測 + IoU',
-    icon: '🎯', time: '3 分鐘',
-    theory: 'IoU = 交集面積 ÷ 聯集面積。完全重疊 IoU=1.0、不重疊 IoU=0。常用門檻 0.5 算「可接受」。',
-    answer: '把橘框（你的預測）拖到藍框（GT）上面，越完全重疊越好',
-    steps: [
-      { title: '進到 L5', action: '選 L5（IoU）。', expected: '看到藍色框（GT）與橘色框（你的預測）在畫布上。' },
-      { title: '理解兩個框', action: '🟦 藍 = Ground Truth（正解）。🟧 橘 = Pred（你的預測，可拖移）。', expected: '心中有概念。' },
-      { title: '看 IoU 即時計算', action: '右側面板顯示交集、聯集、IoU 即時值。', expected: '初始 IoU 可能 0.1~0.3。', why: 'IoU 變化越好越能感覺到拖框的影響。' },
-      { title: '拖橘框', action: '滑鼠按住橘框拖到藍框上方。', expected: 'IoU 快速攀升。', why: '兩框越重疊，IoU 越接近 1.0。' },
-      { title: '微調對齊', action: '把橘框拖到完全對準藍框。', expected: 'IoU 接近 1.0、變成綠色。' },
-      { title: '提交', action: 'IoU ≥ 0.65 即過關。', expected: '🎉', why: '在實際 CNN 偵測模型中，IoU ≥ 0.5 算正確偵測。' }
-    ]
-  }
-];
-
-// ============================================================
-// UI
-// ============================================================
-function renderSidebar() {
-  const aside = document.getElementById('sidebar');
-  const groups = { feat_enh: [], cnn: [] };
-  LESSONS.forEach(l => groups[l.quest].push(l));
-  let html = `
-    <h3>📂 選擇關卡</h3>
-    <div class="quest-divider">🌳 特徵強化（feat_enh）</div>`;
-  groups.feat_enh.forEach(l => {
-    html += `<a class="lv-link" data-id="${l.id}" onclick="showLesson('${l.id}')">${l.icon} ${l.title}</a>`;
-  });
-  html += `<div class="quest-divider">🧠 CNN</div>`;
-  groups.cnn.forEach(l => {
-    html += `<a class="lv-link" data-id="${l.id}" onclick="showLesson('${l.id}')">${l.icon} ${l.title}</a>`;
-  });
-  aside.innerHTML = html;
+function loadState() {
+  try {
+    const s = localStorage.getItem(STORAGE_KEY);
+    if (s) APP = Object.assign(APP, JSON.parse(s));
+  } catch (e) {}
+}
+function saveState() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(APP)); } catch (e) {}
 }
 
-function showLesson(id) {
-  const l = LESSONS.find(x => x.id === id);
-  if (!l) return;
-  document.querySelectorAll('.lv-link').forEach(a => a.classList.toggle('active', a.dataset.id === id));
-  const liveUrl = l.quest === 'cnn' ? `${LIVE_BASE}/cnn/` : `${LIVE_BASE}/`;
-  const steps = l.steps.map((s, i) => `
-    <div class="step-card" id="step-${i}">
-      <div class="num-badge">步驟 ${i+1} / ${l.steps.length}</div>
-      <h4>${s.title}</h4>
-      <div class="action">▶ <strong>做：</strong>${s.desc || s.action || ''}</div>
-      ${s.expected ? `<div class="expected">✓ <strong>預期看到：</strong>${s.expected}</div>` : ''}
-      ${s.why ? `<div class="why">💡 <strong>為什麼：</strong>${s.why}</div>` : ''}
+// ============================================================
+// Sheet API client
+// ============================================================
+async function sheetCall(payload) {
+  if (!APP.webAppUrl) return { error: '尚未設定 Web App URL' };
+  try {
+    const res = await fetch(APP.webAppUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload),
+      redirect: 'follow'
+    });
+    return await res.json();
+  } catch (e) {
+    return { error: String(e) };
+  }
+}
+
+// ============================================================
+// 導航
+// ============================================================
+document.querySelectorAll('.nav-btn').forEach(b => {
+  b.addEventListener('click', () => switchPage(b.dataset.page));
+});
+function switchPage(id) {
+  document.querySelectorAll('section.page').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelector(`.nav-btn[data-page="${id}"]`)?.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (id === 'setup') renderSetup();
+  if (id === 'leaderboard') loadLeaderboard();
+}
+
+// ============================================================
+// 報到頁 + 作答主頁
+// ============================================================
+function renderQuest() {
+  const container = document.getElementById('questContent');
+  if (!APP.studentId) {
+    container.innerHTML = `
+      <div class="checkin">
+        <h2>📝 報到</h2>
+        <p style="color:#8aa5b5">輸入你的學號與姓名開始作答</p>
+        <input type="text" id="inputId" placeholder="學號" autocomplete="off">
+        <input type="text" id="inputName" placeholder="姓名" autocomplete="off">
+        <button id="checkinBtn" onclick="checkIn()">🚀 開始作答</button>
+        <div id="checkinStatus" style="margin-top:10px;font-size:13px"></div>
+        <div style="margin-top:20px;font-size:11px;color:#5a7080">
+          ${APP.webAppUrl ? '✓ 已連線 Sheet' : '⚠ 未設定 Sheet（純本機模式，進度不會上傳）'}
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  const levels = LEVEL_DEFS.map((lv, i) => {
+    const num = i + 1;
+    const done = APP.levelTimes[i] !== null;
+    const unlocked = num <= APP.unlockedLevel;
+    const current = APP.currentLevel === num;
+    let cls = 'locked';
+    if (done) cls = 'done';
+    else if (current) cls = 'current';
+    else if (unlocked) cls = 'available';
+    let statusText = '🔒 鎖定';
+    if (done) statusText = '✓ 已過 · ' + (APP.levelScores[i] || 0) + '分';
+    else if (current) statusText = '⏳ 進行中';
+    else if (unlocked) statusText = '可作答';
+    return `
+      <div class="level-card ${cls}" onclick="${unlocked?`selectLevel(${num})`:''}">
+        <div class="ico">${lv.icon}</div>
+        <div class="num">L${num}</div>
+        <div class="title">${lv.title}</div>
+        <div class="status">${statusText}</div>
+      </div>
+    `;
+  }).join('');
+
+  const allDone = APP.levelTimes.every(t => t !== null);
+
+  container.innerHTML = `
+    <h2>🎯 你的作答之旅</h2>
+    <div class="levels">${levels}</div>
+    ${allDone ? `
+      <div class="panel" style="background:linear-gradient(135deg,#1a4030,#2a5040);border-color:#4ab87e;text-align:center">
+        <h3 style="color:#5ec88c">🎉 全部關卡完成！</h3>
+        <p>請截圖整個畫面（包含排行榜頁）給老師，可以下課了。</p>
+        <button class="btn success big" onclick="finishAll()">📤 提交結業</button>
+      </div>
+    ` : ''}
+    <div id="levelDetail" class="level-detail"></div>
+  `;
+
+  if (APP.currentLevel && APP.currentLevel <= 5) {
+    renderLevel(APP.currentLevel);
+  }
+}
+
+const LEVEL_DEFS = [];
+
+function selectLevel(n) {
+  if (!APP.levelStartTimes) APP.levelStartTimes = [null,null,null,null,null];
+  if (APP.levelStartTimes[n-1] === null) APP.levelStartTimes[n-1] = Date.now();
+  APP.currentLevel = n;
+  saveState();
+  renderQuest();
+  setTimeout(() => {
+    document.getElementById('levelDetail')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
+}
+
+function renderLevel(n) {
+  const lv = LEVEL_DEFS[n - 1];
+  if (!lv) return;
+  const cont = document.getElementById('levelDetail');
+  cont.innerHTML = `
+    <div class="theory">
+      <h3>${lv.icon} L${n} · ${lv.title}</h3>
+      <div>${lv.theory}</div>
     </div>
-  `).join('');
-  document.getElementById('content').innerHTML = `
-    <h2>${l.icon} ${l.title}</h2>
-    <div class="lv-meta">
-      <span class="tag ${l.quest === 'cnn' ? 'cnn' : ''}">${l.tag}</span>
-      ⏱ ${l.time}　·　共 ${l.steps.length} 步
-    </div>
-    <div class="theory-box">
-      <h4>📖 觀念</h4>
-      <div>${l.theory}</div>
-    </div>
-    <div class="btn-row">
-      <a class="btn" href="${liveUrl}" target="_blank">🚀 開作答頁（新分頁）</a>
-      <a class="btn outline" onclick="document.getElementById('step-0').scrollIntoView({behavior:'smooth'})">⬇ 開始步驟</a>
-    </div>
-    <h3 style="color:#4ab87e;margin-top:30px">📋 逐步引導</h3>
-    ${steps}
-    <details class="answer-reveal">
-      <summary>🔑 直接看答案（教學用 / 卡關時）</summary>
-      <div class="ans">${l.answer}</div>
-    </details>
-    <div class="btn-row" style="margin-top:30px">
-      <a class="btn" href="${liveUrl}" target="_blank">🚀 立刻去作答頁</a>
+    <div class="challenge">
+      <h3>🎯 挑戰任務</h3>
+      <div class="goal">${lv.goal}</div>
+      <div id="hintBox_${n}">${renderHintBox(n)}</div>
+      <div id="challengeBody"></div>
     </div>
   `;
-  window.scrollTo({top: 0, behavior: 'smooth'});
+  lv.render();
 }
 
-renderSidebar();
-// auto-show first lesson
-if (location.hash) {
-  showLesson(location.hash.replace('#', ''));
+async function checkIn() {
+  const id = document.getElementById('inputId').value.trim();
+  const name = document.getElementById('inputName').value.trim();
+  const status = document.getElementById('checkinStatus');
+  if (!id || !name) { status.innerHTML = '<span style="color:#ff6b6b">請輸入學號與姓名</span>'; return; }
+  status.innerHTML = '<span style="color:#8aa5b5">⏳ 報到中...</span>';
+  document.getElementById('checkinBtn').disabled = true;
+
+  APP.studentId = id;
+  APP.studentName = name;
+  APP.startTime = Date.now();
+  APP.unlockedLevel = 1;
+  APP.levelTimes = [null,null,null,null,null];
+  APP.currentLevel = 1;
+  saveState();
+
+  if (APP.webAppUrl) {
+    const r = await sheetCall({ action: 'recordStart', id: id, name: name });
+    if (r.error) status.innerHTML = `<span style="color:#d4a04a">⚠ 已開始（Sheet 同步失敗：${r.error}）</span>`;
+    else status.innerHTML = '<span style="color:#4ab87e">✓ 報到成功</span>';
+  } else {
+    status.innerHTML = '<span style="color:#d4a04a">✓ 已開始（純本機，未設定 Sheet）</span>';
+  }
+  setTimeout(() => { renderQuest(); updateUserBar(); }, 800);
 }
-window.addEventListener('hashchange', () => { if (location.hash) showLesson(location.hash.replace('#', '')); });
+
+// 過關邏輯已移至 levels.js 的 submitLevel()
+
+
+async function finishAll() {
+  if (APP.webAppUrl) {
+    const r = await sheetCall({ action: 'recordFinish', id: APP.studentId });
+    if (r.ok) alert(`🎓 已提交！總耗時 ${formatDuration(r.totalSeconds)}`);
+    else alert('提交失敗：' + (r.error || '未知錯誤'));
+  } else {
+    const sec = Math.round((Date.now() - APP.startTime) / 1000);
+    alert(`🎓 結業！總耗時 ${formatDuration(sec)}（本機模式，未上傳）`);
+  }
+  switchPage('leaderboard');
+}
+
+function updateUserBar() {
+  const bar = document.getElementById('userBar');
+  if (!APP.studentId) { bar.innerHTML = ''; return; }
+  const done = APP.levelTimes.filter(t => t !== null).length;
+  const totalScore = APP.levelScores.reduce((a,b) => a + (b||0), 0);
+  bar.innerHTML = `
+    <span class="name">${APP.studentName}</span>
+    <span style="color:#8aa5b5">(${APP.studentId})</span>
+    <span style="margin-left:12px">題目：${done}/5</span>
+    <span style="margin-left:12px;color:#d4a04a">總分：${totalScore}</span>
+    <span class="timer" id="elapsedTimer">—</span>
+  `;
+}
+setInterval(() => {
+  if (!APP.startTime || !APP.studentId) return;
+  const el = document.getElementById('elapsedTimer');
+  if (el) el.textContent = formatDuration(Math.round((Date.now() - APP.startTime) / 1000));
+}, 1000);
+
+function renderSetup() {
+  document.getElementById('webAppUrl').value = APP.webAppUrl || '';
+  const ls = document.getElementById('localState');
+  if (APP.studentId) {
+    const done = APP.levelTimes.filter(t => t !== null).length;
+    ls.innerHTML = `
+      <p>姓名：<strong>${APP.studentName}</strong> · 學號：<code>${APP.studentId}</code></p>
+      <p>已開始：${new Date(APP.startTime).toLocaleString('zh-TW')}</p>
+      <p>關卡進度：${done}/5</p>
+    `;
+  } else {
+    ls.innerHTML = '<p style="color:#8aa5b5">尚未報到</p>';
+  }
+}
+function saveWebAppUrl() {
+  const url = document.getElementById('webAppUrl').value.trim();
+  APP.webAppUrl = url || null;
+  saveState();
+  document.getElementById('webAppStatus').innerHTML = '<span style="color:#4ab87e">✓ 已儲存</span>';
+}
+async function testWebApp() {
+  const url = document.getElementById('webAppUrl').value.trim();
+  if (!url) { document.getElementById('webAppStatus').innerHTML = '<span style="color:#ff6b6b">請先輸入 URL</span>'; return; }
+  APP.webAppUrl = url;
+  document.getElementById('webAppStatus').innerHTML = '<span style="color:#8aa5b5">⏳ 測試中...</span>';
+  try {
+    const res = await fetch(url + '?action=ping');
+    const j = await res.json();
+    if (j.ok) {
+      document.getElementById('webAppStatus').innerHTML = `<span style="color:#4ab87e">✓ 連線成功！伺服器時間 ${j.time}</span>`;
+      saveState();
+    } else {
+      document.getElementById('webAppStatus').innerHTML = `<span style="color:#ff6b6b">⚠ 回應異常：${JSON.stringify(j)}</span>`;
+    }
+  } catch (e) {
+    document.getElementById('webAppStatus').innerHTML = `<span style="color:#ff6b6b">⚠ 連線失敗：${e.message}<br>確認 URL 是否正確、Apps Script 部署時「存取權」是否設為「任何人」</span>`;
+  }
+}
+function clearProgress() {
+  if (!confirm('確定要清空本機進度嗎？這只會清掉本機資料，不會影響 Sheet 上的紀錄。')) return;
+  const url = APP.webAppUrl;
+  APP = { studentId: null, studentName: null, startTime: null,
+          webAppUrl: url, unlockedLevel: 1, levelTimes: [null,null,null,null,null], currentLevel: null };
+  saveState();
+  renderSetup();
+  renderQuest();
+  updateUserBar();
+  switchPage('quest');
+}
+
+async function loadLeaderboard() {
+  const cont = document.getElementById('leaderboardContent');
+  cont.innerHTML = '<div style="padding:40px;text-align:center;color:#8aa5b5">⏳ 載入中...</div>';
+  if (!APP.webAppUrl) {
+    cont.innerHTML = '<div style="padding:40px;text-align:center;color:#d4a04a">尚未設定 Web App URL</div>';
+    return;
+  }
+  const r = await sheetCall({ action: 'getLeaderboard' });
+  if (r.error || !r.leaderboard) {
+    cont.innerHTML = `<div style="padding:40px;text-align:center;color:#ff6b6b">載入失敗：${r.error || 'unknown'}</div>`;
+    return;
+  }
+  // 解析每關的 "時間 | 分數" 格式
+  function parseLevel(s) {
+    if (!s) return { time: null, score: null };
+    const m = String(s).match(/^(.+?)\s*\|\s*(\d+)$/);
+    if (m) return { time: m[1].trim(), score: parseInt(m[2]) };
+    return { time: String(s), score: null };
+  }
+  const rows = r.leaderboard.map((s, i) => {
+    const rank = i + 1;
+    let rankCls = '';
+    if (rank === 1) rankCls = 'gold';
+    else if (rank === 2) rankCls = 'silver';
+    else if (rank === 3) rankCls = 'bronze';
+    const parsed = s.levels.map(parseLevel);
+    const totalScore = parsed.reduce((a,p) => a + (p.score || 0), 0);
+    const levelsHtml = parsed.map(p => {
+      if (!p.time) return '<span style="color:#5a7080">·</span>';
+      if (p.score !== null) return `<span style="color:#4ab87e" title="${p.time}">${p.score}</span>`;
+      return '<span style="color:#4ab87e">✓</span>';
+    }).join(' ');
+    const totalTime = s.totalSec ? formatDuration(s.totalSec) : '—';
+    return `
+      <tr class="${s.status === 'done' ? 'done' : ''}">
+        <td><span class="lb-rank ${rankCls}">#${rank}</span></td>
+        <td><strong>${s.name}</strong></td>
+        <td>${s.id}</td>
+        <td class="lb-levels">${levelsHtml}</td>
+        <td style="color:#d4a04a;font-weight:bold">${totalScore}</td>
+        <td>${totalTime}</td>
+        <td>${s.status === 'done' ? '✓ 完成' : s.status === 'inprogress' ? '進行中' : s.status}</td>
+      </tr>
+    `;
+  }).join('');
+  cont.innerHTML = `
+    <table>
+      <thead><tr><th>名次</th><th>姓名</th><th>學號</th><th>L1 L2 L3 L4 L5 分數</th><th>總分</th><th>總時間</th><th>狀態</th></tr></thead>
+      <tbody>${rows || '<tr><td colspan="7" style="padding:30px;text-align:center;color:#8aa5b5">尚無資料</td></tr>'}</tbody>
+    </table>
+  `;
+}
+
+loadState();
+loadAllAssets()
+  .then(() => {
+    if (typeof defineLevels === 'function') defineLevels();
+    renderQuest();
+    updateUserBar();
+  })
+  .catch(err => {
+    document.body.innerHTML = '<div style="padding:40px;color:#ff6b6b">⚠ 影像載入失敗：' + err.message + '<br><br>請確認 index.html、core.js、assets/ 在同一個資料夾，並用 Chrome / Edge 直接打開。</div>';
+  });
+
+// ============================================================
+// 提示系統：每 10 分鐘解鎖一條提示
+// ============================================================
+function renderHintBox(n) {
+  const hints = (typeof getLevelHints === 'function') ? getLevelHints(n) : [];
+  if (hints.length === 0) return '';
+  const start = (APP.levelStartTimes && APP.levelStartTimes[n-1]) || Date.now();
+  const elapsedMin = (Date.now() - start) / 60000;
+  const shown = Math.min(hints.length, Math.floor(elapsedMin / 10));
+  let html = '<div style="background:rgba(212,160,74,0.10);border-left:3px solid #d4a04a;padding:12px 16px;margin:12px 0;border-radius:0 6px 6px 0;font-size:13px">';
+  html += '<div style="font-size:11px;color:#d4a04a;margin-bottom:6px;letter-spacing:1px">💡 提示系統（每 10 分鐘解鎖一條）</div>';
+  if (shown === 0) {
+    const next = Math.max(0, Math.ceil(10 - elapsedMin));
+    html += '<div style="color:#8aa5b5">🕒 還在思考中？再 <strong>' + next + '</strong> 分鐘會解鎖第 1 條提示。</div>';
+  } else {
+    for (let i = 0; i < shown; i++) {
+      html += '<div style="color:#e5d0a8;margin-bottom:6px"><strong>提示 ' + (i+1) + '：</strong>' + hints[i] + '</div>';
+    }
+    if (shown < hints.length) {
+      const nextAt = (shown + 1) * 10;
+      const remain = Math.max(0, Math.ceil(nextAt - elapsedMin));
+      html += '<div style="color:#5a7080;margin-top:8px;font-size:12px">🔒 下一條提示再 <strong>' + remain + '</strong> 分鐘解鎖。</div>';
+    } else {
+      html += '<div style="color:#4ab87e;margin-top:8px;font-size:12px">✓ 全部提示已解鎖。</div>';
+    }
+  }
+  return html + '</div>';
+}
+setInterval(() => {
+  const n = APP.currentLevel;
+  if (!n) return;
+  const box = document.getElementById('hintBox_' + n);
+  if (box) box.innerHTML = renderHintBox(n).replace(/^<div[^>]+>|<\/div>$/g, '');
+}, 30000);
+
 </script>
+<script src="levels.js"></script>
 
 </body>
 </html>
