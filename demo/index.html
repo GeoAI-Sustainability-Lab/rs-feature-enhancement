@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>教學示範與互動練習 — 遙感探測與實習</title>
+<style>
+* { box-sizing: border-box; }
+body { margin: 0; font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif; background: #0f1419; color: #e6e6e6; line-height: 1.6; }
+header { background: linear-gradient(135deg, #1a5a3a, #2c7c5a); padding: 16px 28px; border-bottom: 2px solid #4ab87e; position: sticky; top: 0; z-index: 100; }
+header h1 { margin: 0 0 4px 0; font-size: 20px; color: #fff; }
+header .sub { font-size: 12px; color: #c5e6d0; margin-bottom: 8px; }
+nav { display: flex; gap: 6px; flex-wrap: wrap; }
+nav a { background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); color: #d4e6f0; padding: 7px 14px; border-radius: 6px; font-size: 13px; text-decoration: none; }
+nav a:hover { background: rgba(255,255,255,0.18); }
+nav a.active { background: #4ab87e; border-color: #5ec88c; color: #fff; }
+main { max-width: 1300px; margin: 0 auto; padding: 24px 28px; }
+.intro { background: #1a2530; border-radius: 10px; padding: 24px 30px; margin-bottom: 24px; }
+.intro h2 { color: #4ab87e; margin-top: 0; }
+.lesson { display: none; }
+.lesson.active { display: block; animation: fade .25s; }
+@keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+h2 { color: #4ab87e; margin: 0 0 4px 0; }
+.lv-meta { color: #8aa5b5; font-size: 13px; margin-bottom: 18px; }
+.tag { display: inline-block; background: rgba(74,184,126,0.18); color: #5ec88c; font-size: 11px; padding: 2px 8px; border-radius: 10px; }
+.theory { background: rgba(74,141,184,0.10); border-left: 3px solid #6bb6db; padding: 12px 18px; margin: 14px 0; border-radius: 0 6px 6px 0; }
+.theory h4 { margin: 0 0 4px 0; color: #6bb6db; font-size: 13px; letter-spacing: 1px; }
+.step { background: #1a2530; border: 1px solid #2a3a4a; border-radius: 8px; padding: 14px 20px; margin: 10px 0; }
+.step .num { display: inline-block; background: #4ab87e; color: #fff; font-size: 11px; padding: 2px 8px; border-radius: 10px; margin-right: 8px; font-weight: bold; }
+.step .title { color: #c5e6d0; font-weight: bold; display: inline; }
+.step .act { color: #d4f0d0; margin-top: 6px; font-size: 14px; }
+.step .why { color: #b8d4e0; font-size: 12px; margin-top: 4px; font-style: italic; }
+.practice { background: linear-gradient(135deg, #1a3a52, #1a2530); border: 2px solid #6bb6db; border-radius: 10px; padding: 18px 22px; margin-top: 20px; }
+.practice h3 { color: #9bd1eb; margin: 0 0 8px 0; font-size: 18px; }
+.practice .desc { color: #b8d4e0; font-size: 13px; margin-bottom: 14px; }
+.layout { display: grid; grid-template-columns: 280px 1fr; gap: 16px; margin-top: 12px; }
+.panel { background: #0f1a24; padding: 14px 16px; border-radius: 6px; }
+.panel label { display: block; font-size: 12px; color: #b8d4e0; margin: 8px 0 2px 0; }
+.panel input[type=range] { width: 100%; accent-color: #6bb6db; }
+.panel select { width: 100%; background: #1a2530; color: #fff; border: 1px solid #2a4055; padding: 5px 8px; border-radius: 4px; }
+.val { color: #6bb6db; font-weight: bold; }
+.canvas-wrap { background: #000; padding: 6px; border-radius: 6px; display: flex; flex-direction: column; align-items: center; }
+canvas { image-rendering: pixelated; max-width: 100%; }
+.kgrid { display: inline-grid; grid-template-columns: repeat(3, 48px); gap: 3px; }
+.kgrid input { width: 48px; text-align: center; padding: 4px 0; font-family: monospace; font-size: 13px; background: #1a2530; color: #fff; border: 1px solid #2a4055; border-radius: 3px; }
+.stat { background: #0f1a24; padding: 8px 14px; border-radius: 6px; margin: 8px 0; border-left: 3px solid #6bb6db; }
+.stat .lab { font-size: 11px; color: #8aa5b5; }
+.stat .v { font-size: 15px; color: #fff; font-weight: bold; }
+.row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px; }
+.note { font-size: 12px; color: #d4a04a; margin-top: 8px; }
+.colorpick { display: inline-block; width: 60px; height: 60px; border-radius: 6px; border: 2px solid #2a4055; cursor: pointer; }
+.colorpick.sel { border-color: #4ab87e; box-shadow: 0 0 12px rgba(74,184,126,0.4); }
+.color-row { display: flex; gap: 8px; flex-wrap: wrap; margin: 10px 0; }
+button.btn { background: #4ab87e; color: #fff; border: none; padding: 8px 16px; border-radius: 4px; cursor: pointer; font-size: 13px; }
+button.btn:hover { background: #5ec88c; }
+button.btn.outline { background: transparent; border: 1px solid #4ab87e; color: #4ab87e; }
+.cta-bar { background: rgba(74,184,126,0.10); border-radius: 6px; padding: 12px 16px; margin-top: 20px; border-left: 3px solid #4ab87e; font-size: 13px; }
+.cta-bar a { color: #5ec88c; text-decoration: none; font-weight: bold; }
+.flex { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+footer { text-align: center; padding: 20px; color: #5a7080; font-size: 12px; border-top: 1px solid #2a3a4a; margin-top: 30px; }
+.warning { background: rgba(212,160,74,0.10); border-left: 3px solid #d4a04a; padding: 10px 14px; border-radius: 0 4px 4px 0; margin: 12px 0; color: #e5d0a8; font-size: 13px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>📖 教學示範與互動練習</h1>
+  <div class="sub">遙感探測與實習 · 國立中興大學 森林學系 · 大Q · 5 關互動式教材</div>
+  <nav id="lesson-nav"></nav>
+</header>
+
+<main>
+  <div class="intro" id="intro">
+    <h2>👋 歡迎</h2>
+    <p>這頁是 <strong>5 個互動式練習</strong>，跟<a href="../index.html" style="color:#5ec88c">特徵強化請作答</a>的 L1-L5 是同樣的主題，但這裡：</p>
+    <ul>
+      <li>✅ <strong>每關都能即時操作</strong>（拉滑桿、填數字、看結果即時變化）</li>
+      <li>✅ <strong>用不同的題目 / 圖片 / 參數</strong>，讓你不只重複請作答的內容</li>
+      <li>✅ <strong>有步驟引導</strong>，照著做就會懂</li>
+      <li>✅ <strong>不評分</strong>，純練習用 — 弄懂後再去請作答頁衝關</li>
+    </ul>
+    <p style="color:#c5b6db">👈 從上方選一關開始</p>
+    <p style="margin-top:20px;font-size:12px;color:#5a7080">需要載入幾秒（先抓影像資源）。請稍候。</p>
+  </div>
+
+  <!-- ========== L1 NDVI ========== -->
+  <div class="lesson" data-lv="1">
+    <h2>🌱 L1 — 植生指標（NDVI）</h2>
+    <div class="lv-meta"><span class="tag">5 分鐘</span> · 練習：用不同門檻看綠覆率變化</div>
+
+    <div class="theory">
+      <h4>📖 觀念</h4>
+      <p>NDVI = (NIR − R) / (NIR + R)。植物對紅光吸收強、近紅外反射強，所以 NDVI 越接近 +1 越像植物。把 NDVI &gt; 門檻的像素視為植被，就能算「綠覆率」。</p>
+    </div>
+
+    <div class="step"><span class="num">1</span><span class="title">先看 NDVI 色階圖</span>
+      <div class="act">下面互動區的左圖是 NDVI 色階圖 — 紅 = 非植被、綠 = 植被。先用眼睛掃過去，建立直覺。</div>
+    </div>
+    <div class="step"><span class="num">2</span><span class="title">拉門檻滑桿從低到高</span>
+      <div class="act">把門檻從 -0.5 拉到 +0.9。觀察右邊「植被遮罩」白色區域的變化。</div>
+      <div class="why">門檻低 → 任何稍微像植物的像素都被視為植被 → 白色多。門檻高 → 只有最像植物的才算 → 白色少。</div>
+    </div>
+    <div class="step"><span class="num">3</span><span class="title">試三個經典門檻</span>
+      <div class="act">點下方按鈕快速跳到 <code>0.2 / 0.4 / 0.6</code> 三個常見值，比較差異。</div>
+    </div>
+
+    <div class="practice">
+      <h3>🎮 互動練習</h3>
+      <div class="desc">調整門檻，看綠覆率即時變化（沒有目標、沒有分數，純粹手感）。</div>
+      <div class="layout">
+        <div class="panel">
+          <label>NDVI 門檻 <span class="val" id="L1Th">0.30</span></label>
+          <input type="range" id="L1ThSlider" min="-0.5" max="0.9" step="0.01" value="0.30">
+          <div class="flex" style="margin:12px 0">
+            <button class="btn outline" onclick="L1SetTh(0.2)">0.2 寬鬆</button>
+            <button class="btn outline" onclick="L1SetTh(0.4)">0.4 中等</button>
+            <button class="btn outline" onclick="L1SetTh(0.6)">0.6 嚴格</button>
+          </div>
+          <div class="stat"><div class="lab">綠覆率</div><div class="v" id="L1Cov">—</div></div>
+          <div class="stat" style="border-left-color:#d4a04a"><div class="lab">遮罩白色像素</div><div class="v" id="L1Pix">—</div></div>
+        </div>
+        <div class="row3">
+          <div><div class="canvas-wrap"><canvas id="L1Ndvi"></canvas></div><div style="text-align:center;font-size:11px;color:#8aa5b5;margin-top:4px">NDVI 色階</div></div>
+          <div><div class="canvas-wrap"><canvas id="L1Rgb"></canvas></div><div style="text-align:center;font-size:11px;color:#8aa5b5;margin-top:4px">航拍原圖</div></div>
+          <div><div class="canvas-wrap"><canvas id="L1Mask"></canvas></div><div style="text-align:center;font-size:11px;color:#8aa5b5;margin-top:4px">植被遮罩</div></div>
+        </div>
+      </div>
+      <div class="note">💡 試試看：哪個門檻最能準確切出航拍中的林地？（答案因人而異，看你的應用場景）</div>
+    </div>
+
+    <div class="cta-bar">📌 練熟後 → 去 <a href="../index.html" target="_blank">特徵強化請作答 L1</a> 闖關（不同目標、目標不告訴你）</div>
+  </div>
+
+  <!-- ========== L2 色彩空間 ========== -->
+  <div class="lesson" data-lv="2">
+    <h2>🎨 L2 — 色彩空間（HSV）</h2>
+    <div class="lv-meta"><span class="tag">5 分鐘</span> · 練習：三軸自由組合看效果</div>
+
+    <div class="theory">
+      <h4>📖 觀念</h4>
+      <p>HSV = 色相 (Hue) / 飽和度 (Saturation) / 明度 (Value)。三個軸獨立，分別控制顏色種類、純度、亮度。比 RGB 直觀很多。</p>
+    </div>
+
+    <div class="step"><span class="num">1</span><span class="title">觀察單獨調 H 的效果</span><div class="act">把 H 從 -60 拉到 +60，S/V 維持 1.0。整張圖的顏色種類在「旋轉」。</div></div>
+    <div class="step"><span class="num">2</span><span class="title">觀察單獨調 S</span><div class="act">S 從 0 到 2.0，H/V 維持。S=0 整張變灰階（除去顏色），S=2 顏色被誇大。</div></div>
+    <div class="step"><span class="num">3</span><span class="title">觀察單獨調 V</span><div class="act">V 從 0 到 2.0。V=0 全黑，V=2 過曝。</div></div>
+    <div class="step"><span class="num">4</span><span class="title">挑戰：「老照片」效果</span><div class="act">試著做出「老照片」感：H 不動、S 拉低（褪色）、V 微降（變暗）。</div></div>
+
+    <div class="practice">
+      <h3>🎮 互動練習</h3>
+      <div class="desc">調 HSV 三軸，原圖 vs 結果並排比較。下方有「預設效果」可一鍵套用。</div>
+      <div class="layout">
+        <div class="panel">
+          <label>H 色相位移 <span class="val" id="L2Hv">0</span>°</label>
+          <input type="range" id="L2H" min="-60" max="60" step="1" value="0">
+          <label>S 飽和度倍率 <span class="val" id="L2Sv">1.00</span></label>
+          <input type="range" id="L2S" min="0" max="2" step="0.01" value="1.0">
+          <label>V 明度倍率 <span class="val" id="L2Vv">1.00</span></label>
+          <input type="range" id="L2V" min="0" max="2" step="0.01" value="1.0">
+          <div style="margin-top:10px">
+            <button class="btn outline" onclick="L2Preset(0,0,1)">純灰階 (S=0)</button>
+            <button class="btn outline" onclick="L2Preset(0,0.4,0.8)">老照片</button>
+            <button class="btn outline" onclick="L2Preset(20,1.5,1.0)">夕陽暖色</button>
+            <button class="btn outline" onclick="L2Preset(-30,1.0,1.0)">寒色調</button>
+            <button class="btn outline" onclick="L2Preset(0,1,1)">原圖</button>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div><div class="canvas-wrap"><canvas id="L2In"></canvas></div><div style="text-align:center;font-size:11px;color:#8aa5b5;margin-top:4px">原圖</div></div>
+          <div><div class="canvas-wrap"><canvas id="L2Out"></canvas></div><div style="text-align:center;font-size:11px;color:#8aa5b5;margin-top:4px">處理後</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="cta-bar">📌 練熟後 → 去 <a href="../index.html" target="_blank">特徵強化請作答 L2</a> 闖關</div>
+  </div>
+
+  <!-- ========== L3 形態學 ========== -->
+  <div class="lesson" data-lv="3">
+    <h2>⬛ L3 — 形態學運算</h2>
+    <div class="lv-meta"><span class="tag">6 分鐘</span> · 練習：4 種運算各看一次效果</div>
+
+    <div class="theory">
+      <h4>📖 觀念</h4>
+      <p>形態學 4 個基本運算對二值圖（黑白）操作：</p>
+      <ul>
+        <li><strong>膨脹</strong>：白色變大（吃掉小黑洞）</li>
+        <li><strong>侵蝕</strong>：白色變小（吃掉小白雜點）</li>
+        <li><strong>開運算 = 先侵蝕後膨脹</strong>：去雜點但保留主體大小</li>
+        <li><strong>閉運算 = 先膨脹後侵蝕</strong>：填洞但保留主體大小</li>
+      </ul>
+    </div>
+
+    <div class="step"><span class="num">1</span><span class="title">先看原圖</span><div class="act">下方互動區用一張帶有雜點和小洞的字母 H 圖。觀察缺陷位置。</div></div>
+    <div class="step"><span class="num">2</span><span class="title">試「膨脹」</span><div class="act">選膨脹、結構元 3×3、迭代 1 次。看字母變粗、洞消失。</div></div>
+    <div class="step"><span class="num">3</span><span class="title">試「侵蝕」</span><div class="act">字母變細、雜點消失但主體也變細。</div></div>
+    <div class="step"><span class="num">4</span><span class="title">挑戰：「乾淨的字母」</span><div class="act">先開（去雜點）再閉（填洞）。先做「開運算」迭代 1 次，再做「閉運算」迭代 1 次。</div></div>
+
+    <div class="practice">
+      <h3>🎮 互動練習</h3>
+      <div class="desc">原圖是有雜點和洞的字母 H。試各種運算組合，看效果。</div>
+      <div class="layout">
+        <div class="panel">
+          <label>運算</label>
+          <select id="L3Op"><option value="dilate">膨脹</option><option value="erode">侵蝕</option><option value="open">開運算</option><option value="close">閉運算</option></select>
+          <label>結構元大小 <span class="val" id="L3Kv">3</span>×<span id="L3Kv2">3</span></label>
+          <input type="range" id="L3K" min="3" max="9" step="2" value="3">
+          <label>形狀</label>
+          <select id="L3Sh"><option value="square">方形</option><option value="cross">十字</option><option value="circle">圓形</option></select>
+          <label>迭代次數 <span class="val" id="L3Iv">1</span></label>
+          <input type="range" id="L3I" min="1" max="5" value="1">
+          <button class="btn" onclick="L3Run()" style="width:100%;margin-top:10px">▶ 套用</button>
+          <button class="btn outline" onclick="L3Run(true)" style="width:100%;margin-top:6px">🔄 重設原圖</button>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div><div class="canvas-wrap"><canvas id="L3In" width="200" height="200"></canvas></div><div style="text-align:center;font-size:11px;color:#8aa5b5;margin-top:4px">原圖（有雜點 + 洞）</div></div>
+          <div><div class="canvas-wrap"><canvas id="L3Out" width="200" height="200"></canvas></div><div style="text-align:center;font-size:11px;color:#8aa5b5;margin-top:4px">處理後</div></div>
+        </div>
+      </div>
+      <div class="note">💡 試挑戰：用最少的運算次數，做出「主體完整但無雜點」的字母 H。</div>
+    </div>
+    <div class="cta-bar">📌 練熟後 → 去 <a href="../index.html" target="_blank">特徵強化請作答 L3</a> 闖關</div>
+  </div>
+
+  <!-- ========== L4 濾波器 ========== -->
+  <div class="lesson" data-lv="4">
+    <h2>🔲 L4 — 卷積濾波器</h2>
+    <div class="lv-meta"><span class="tag">5 分鐘</span> · 練習：6 種預設 + 自訂 kernel</div>
+
+    <div class="theory">
+      <h4>📖 觀念</h4>
+      <p>卷積 = 每個輸出像素 = kernel 與鄰近像素加權和。不同 kernel 做不同事：均值=模糊、Sobel=邊緣、Laplacian=邊緣、銳化=反模糊。</p>
+    </div>
+
+    <div class="step"><span class="num">1</span><span class="title">逐個試預設</span><div class="act">點下方 6 顆按鈕（均值、高斯、Sobel-X、Sobel-Y、Laplacian、銳化），看效果。</div></div>
+    <div class="step"><span class="num">2</span><span class="title">看 kernel 數值</span><div class="act">每按一個預設，下方 9 格會顯示對應的 kernel 數值。注意正負分布。</div></div>
+    <div class="step"><span class="num">3</span><span class="title">挑戰：自訂 kernel</span><div class="act">手動編輯 9 格，看看能做出什麼奇怪的效果。試試對角線方向的邊緣偵測。</div></div>
+
+    <div class="practice">
+      <h3>🎮 互動練習</h3>
+      <div class="desc">9 格 kernel 直接編輯，按「套用」看效果。或一鍵切換預設。</div>
+      <div class="layout">
+        <div class="panel">
+          <div class="kgrid" id="L4Kg">${Array(9).fill(0).map((_,i)=>`<input type="number" step="any" value="0" id="L4K${i}">`).join('')}</div>
+          <label style="margin-top:10px">Divisor <span class="val" id="L4Dv">1</span></label>
+          <input type="range" id="L4D" min="1" max="20" value="1">
+          <label>Bias <span class="val" id="L4Bv">0</span></label>
+          <input type="range" id="L4B" min="-128" max="255" value="0">
+          <button class="btn" onclick="L4Run()" style="width:100%;margin-top:10px">▶ 套用</button>
+          <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:4px">
+            <button class="btn outline" onclick="L4Preset('mean')">均值</button>
+            <button class="btn outline" onclick="L4Preset('gauss')">高斯</button>
+            <button class="btn outline" onclick="L4Preset('sx')">Sobel-X</button>
+            <button class="btn outline" onclick="L4Preset('sy')">Sobel-Y</button>
+            <button class="btn outline" onclick="L4Preset('lap')">Laplacian</button>
+            <button class="btn outline" onclick="L4Preset('sharp')">銳化</button>
+          </div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div><div class="canvas-wrap"><canvas id="L4In"></canvas></div><div style="text-align:center;font-size:11px;color:#8aa5b5;margin-top:4px">原圖</div></div>
+          <div><div class="canvas-wrap"><canvas id="L4Out"></canvas></div><div style="text-align:center;font-size:11px;color:#8aa5b5;margin-top:4px">處理後</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="cta-bar">📌 練熟後 → 去 <a href="../index.html" target="_blank">特徵強化請作答 L4</a> 闖關</div>
+  </div>
+
+  <!-- ========== L5 HSL 葉色 ========== -->
+  <div class="lesson" data-lv="5">
+    <h2>🎯 L5 — HSL 葉色匹配</h2>
+    <div class="lv-meta"><span class="tag">3 分鐘</span> · 練習：8 種葉色配色挑戰</div>
+
+    <div class="theory">
+      <h4>📖 觀念</h4>
+      <p>HSL（色相/飽和度/亮度）跟 HSV 類似但 L 定義為「最亮最暗的中點」，更直覺。植被顏色細微差異就是 HSL 的差異。</p>
+    </div>
+
+    <div class="step"><span class="num">1</span><span class="title">看左邊目標葉子</span><div class="act">紀錄它的顏色感覺（哪種綠 / 黃 / 紅 / 深淺）。</div></div>
+    <div class="step"><span class="num">2</span><span class="title">先大致對齊 H</span><div class="act">H 0-30=紅、30-60=橘黃、60-90=黃綠、90-150=綠、150-180=深綠帶藍。</div></div>
+    <div class="step"><span class="num">3</span><span class="title">調 S</span><div class="act">飽和度看葉子是「鮮豔」還是「淡」。</div></div>
+    <div class="step"><span class="num">4</span><span class="title">調 L</span><div class="act">亮度看「深」還是「淺」。</div></div>
+    <div class="step"><span class="num">5</span><span class="title">換一種葉色再來</span><div class="act">按「換目標」試試別的葉子。練 5-8 種類型培養色感。</div></div>
+
+    <div class="practice">
+      <h3>🎮 互動練習</h3>
+      <div class="desc">左邊目標葉色，右邊你調的色。即時匹配度 0-100。</div>
+      <div class="layout">
+        <div class="panel">
+          <label>H 色相 <span class="val" id="L5Hv">120</span>°</label>
+          <input type="range" id="L5H" min="0" max="360" value="120">
+          <label>S 飽和度 <span class="val" id="L5Sv">50</span>%</label>
+          <input type="range" id="L5S" min="0" max="100" value="50">
+          <label>L 亮度 <span class="val" id="L5Lv">50</span>%</label>
+          <input type="range" id="L5L" min="0" max="100" value="50">
+          <div class="stat" style="margin-top:10px"><div class="lab">即時匹配度</div><div class="v" id="L5Match" style="font-size:24px">—</div></div>
+          <button class="btn" onclick="L5NewTarget()" style="width:100%;margin-top:10px">🎲 換一個目標葉色</button>
+          <div id="L5HslCode" style="background:#0a0a18;color:#9bd1eb;padding:6px;border-radius:3px;font-family:monospace;font-size:11px;margin-top:8px">—</div>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+          <div><div class="canvas-wrap" style="background:transparent"><canvas id="L5Tgt" width="220" height="220"></canvas></div><div id="L5TgtName" style="text-align:center;font-size:12px;color:#8aa5b5;margin-top:4px">目標</div></div>
+          <div><div class="canvas-wrap" style="background:transparent"><canvas id="L5You" width="220" height="220"></canvas></div><div style="text-align:center;font-size:12px;color:#8aa5b5;margin-top:4px">你的調色</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="cta-bar">📌 練熟後 → 去 <a href="../index.html" target="_blank">特徵強化請作答 L5</a> 闖關</div>
+  </div>
+
+  <div class="warning" id="loading-warning" style="text-align:center;font-size:14px;padding:30px">
+    ⏳ 載入影像資源中...（首次需要 2-5 秒）
+  </div>
+</main>
+
+<footer>遙感探測與實習 · 教學示範與互動練習 · 大Q | 純練習用 · 不評分</footer>
+
+<script src="../core.js"></script>
+<script src="../assets.js"></script>
+<script>
+// ============================================================
+// 導航
+// ============================================================
+const lessons = ['intro', ...Array.from({length:5}, (_,i)=>'lv-'+(i+1))];
+const navHtml = ['🏠 簡介', '🌱 L1 NDVI', '🎨 L2 色彩空間', '⬛ L3 形態學', '🔲 L4 濾波器', '🎯 L5 HSL 葉色']
+  .map((t,i) => `<a class="${i===0?'active':''}" data-i="${i}" onclick="navTo(${i})">${t}</a>`).join('');
+document.getElementById('lesson-nav').innerHTML = navHtml;
+function navTo(i) {
+  document.querySelectorAll('nav a').forEach((a,j) => a.classList.toggle('active', j===i));
+  document.getElementById('intro').style.display = i===0 ? 'block' : 'none';
+  document.querySelectorAll('.lesson').forEach((l, j) => l.classList.toggle('active', j === i-1));
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+// ============================================================
+// 啟動：等資源載入
+// ============================================================
+window.addEventListener('load', async () => {
+  try {
+    await loadAllAssets();
+    document.getElementById('loading-warning').style.display = 'none';
+    initL1(); initL2(); initL3(); initL4(); initL5();
+  } catch (e) {
+    document.getElementById('loading-warning').innerHTML = '⚠ 載入失敗：' + (e.message || e);
+  }
+});
+
+// ============================================================
+// L1 NDVI
+// ============================================================
+function initL1() {
+  const W = IMG.bandW, H = IMG.bandH;
+  const ndvi = new Float32Array(W*H);
+  const R = IMG.bands[2], NIR = IMG.bands[4];
+  for (let i = 0; i < ndvi.length; i++) ndvi[i] = (NIR[i]-R[i])/(NIR[i]+R[i]+1e-6);
+  window._L1ndvi = ndvi; window._L1W = W; window._L1H = H;
+  // 畫 NDVI 色階參考
+  const c1 = document.getElementById('L1Ndvi');
+  c1.width = W; c1.height = H;
+  const imd = new ImageData(W, H);
+  for (let i = 0; i < ndvi.length; i++) {
+    const t = (ndvi[i]+1)/2;
+    const [r,g,b] = applyCmap(t, 'rdylgn');
+    imd.data[i*4]=r; imd.data[i*4+1]=g; imd.data[i*4+2]=b; imd.data[i*4+3]=255;
+  }
+  c1.getContext('2d').putImageData(imd, 0, 0);
+  // RGB 縮小放置
+  const rgb = IMG.rgb;
+  const c2 = document.getElementById('L1Rgb');
+  c2.width = W; c2.height = H;
+  const tmp = document.createElement('canvas'); tmp.width = rgb.width; tmp.height = rgb.height;
+  tmp.getContext('2d').putImageData(rgb, 0, 0);
+  c2.getContext('2d').drawImage(tmp, 0, 0, W, H);
+  document.getElementById('L1ThSlider').addEventListener('input', L1Update);
+  L1Update();
+}
+function L1Update() {
+  const th = parseFloat(document.getElementById('L1ThSlider').value);
+  document.getElementById('L1Th').textContent = th.toFixed(2);
+  const W = window._L1W, H = window._L1H, ndvi = window._L1ndvi;
+  let veg = 0;
+  const imd = new ImageData(W, H);
+  for (let i = 0; i < ndvi.length; i++) {
+    if (ndvi[i] > th) { veg++; imd.data[i*4]=60; imd.data[i*4+1]=200; imd.data[i*4+2]=80; }
+    else { imd.data[i*4]=60; imd.data[i*4+1]=60; imd.data[i*4+2]=60; }
+    imd.data[i*4+3]=255;
+  }
+  const c = document.getElementById('L1Mask'); c.width = W; c.height = H;
+  c.getContext('2d').putImageData(imd, 0, 0);
+  document.getElementById('L1Cov').textContent = (veg/ndvi.length*100).toFixed(1) + '%';
+  document.getElementById('L1Pix').textContent = veg.toLocaleString() + ' px';
+}
+function L1SetTh(v) { document.getElementById('L1ThSlider').value = v; L1Update(); }
+
+// ============================================================
+// L2 HSV
+// ============================================================
+function initL2() {
+  const src = IMG.meme;
+  const ci = document.getElementById('L2In');
+  ci.width = src.width; ci.height = src.height;
+  ci.getContext('2d').putImageData(src, 0, 0);
+  ['L2H','L2S','L2V'].forEach(id => document.getElementById(id).addEventListener('input', L2Update));
+  L2Update();
+}
+function L2Update() {
+  const h = parseInt(document.getElementById('L2H').value);
+  const s = parseFloat(document.getElementById('L2S').value);
+  const v = parseFloat(document.getElementById('L2V').value);
+  document.getElementById('L2Hv').textContent = (h>0?'+':'') + h;
+  document.getElementById('L2Sv').textContent = s.toFixed(2);
+  document.getElementById('L2Vv').textContent = v.toFixed(2);
+  const src = IMG.meme;
+  const c = document.getElementById('L2Out');
+  c.width = src.width; c.height = src.height;
+  const out = new ImageData(src.width, src.height);
+  for (let i = 0; i < src.data.length; i += 4) {
+    const [hh, ss, vv] = rgb2hsv(src.data[i], src.data[i+1], src.data[i+2]);
+    const [r, g, b] = hsv2rgb(hh+h, Math.min(1, ss*s), Math.min(1, vv*v));
+    out.data[i] = Math.max(0, Math.min(255, r));
+    out.data[i+1] = Math.max(0, Math.min(255, g));
+    out.data[i+2] = Math.max(0, Math.min(255, b));
+    out.data[i+3] = 255;
+  }
+  c.getContext('2d').putImageData(out, 0, 0);
+}
+function L2Preset(h, s, v) {
+  document.getElementById('L2H').value = h;
+  document.getElementById('L2S').value = s;
+  document.getElementById('L2V').value = v;
+  L2Update();
+}
+
+// ============================================================
+// L3 形態學
+// ============================================================
+let _L3orig;
+function initL3() {
+  // 產生「字母 H + 雜點 + 洞」
+  const W = 200, H = 200;
+  const arr = new Uint8Array(W*H);
+  // 字母 H
+  for (let y = 40; y < 160; y++) {
+    for (let x = 40; x < 60; x++) arr[y*W+x] = 255;  // 左柱
+    for (let x = 140; x < 160; x++) arr[y*W+x] = 255;  // 右柱
+  }
+  for (let y = 90; y < 110; y++)
+    for (let x = 40; x < 160; x++) arr[y*W+x] = 255;  // 橫桿
+  // 隨機雜點
+  for (let i = 0; i < 80; i++) {
+    const x = Math.floor(Math.random()*W), y = Math.floor(Math.random()*H);
+    if (arr[y*W+x] === 0) for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+      const xx = x+dx, yy = y+dy;
+      if (xx>=0 && xx<W && yy>=0 && yy<H) arr[yy*W+xx] = 255;
+    }
+  }
+  // 隨機洞
+  for (let i = 0; i < 30; i++) {
+    const x = 40 + Math.floor(Math.random()*120), y = 40 + Math.floor(Math.random()*120);
+    if (arr[y*W+x] === 255) for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) {
+      const xx = x+dx, yy = y+dy;
+      if (xx>=0 && xx<W && yy>=0 && yy<H && arr[yy*W+xx] === 255) arr[yy*W+xx] = 0;
+    }
+  }
+  _L3orig = { arr, W, H };
+  const c = document.getElementById('L3In');
+  c.getContext('2d').putImageData(binaryToImageData(arr, W, H), 0, 0);
+  document.getElementById('L3K').addEventListener('input', e => { document.getElementById('L3Kv').textContent = e.target.value; document.getElementById('L3Kv2').textContent = e.target.value; });
+  document.getElementById('L3I').addEventListener('input', e => { document.getElementById('L3Iv').textContent = e.target.value; });
+  L3Run(true);
+}
+function L3Run(reset) {
+  const { arr, W, H } = _L3orig;
+  if (reset) {
+    document.getElementById('L3Out').getContext('2d').putImageData(binaryToImageData(arr, W, H), 0, 0);
+    return;
+  }
+  const op = document.getElementById('L3Op').value;
+  const k = parseInt(document.getElementById('L3K').value);
+  const sh = document.getElementById('L3Sh').value;
+  const it = parseInt(document.getElementById('L3I').value);
+  const kernel = getStructElement(k, sh);
+  const out = applyMorphOp(arr, W, H, op, kernel, it);
+  document.getElementById('L3Out').getContext('2d').putImageData(binaryToImageData(out, W, H), 0, 0);
+}
+
+// ============================================================
+// L4 濾波器
+// ============================================================
+const L4_PRESETS = {
+  mean:  { k: [1,1,1,1,1,1,1,1,1], d: 9, b: 0 },
+  gauss: { k: [1,2,1,2,4,2,1,2,1], d: 16, b: 0 },
+  sx:    { k: [-1,0,1,-2,0,2,-1,0,1], d: 1, b: 128 },
+  sy:    { k: [-1,-2,-1,0,0,0,1,2,1], d: 1, b: 128 },
+  lap:   { k: [0,-1,0,-1,4,-1,0,-1,0], d: 1, b: 128 },
+  sharp: { k: [0,-1,0,-1,5,-1,0,-1,0], d: 1, b: 0 }
+};
+function initL4() {
+  const src = IMG.meme;
+  const ci = document.getElementById('L4In');
+  ci.width = src.width; ci.height = src.height;
+  ci.getContext('2d').putImageData(src, 0, 0);
+  document.getElementById('L4D').addEventListener('input', e => document.getElementById('L4Dv').textContent = e.target.value);
+  document.getElementById('L4B').addEventListener('input', e => document.getElementById('L4Bv').textContent = e.target.value);
+  L4Preset('mean');
+}
+function L4Preset(name) {
+  const p = L4_PRESETS[name];
+  for (let i = 0; i < 9; i++) document.getElementById('L4K'+i).value = p.k[i];
+  document.getElementById('L4D').value = p.d;
+  document.getElementById('L4Dv').textContent = p.d;
+  document.getElementById('L4B').value = p.b;
+  document.getElementById('L4Bv').textContent = p.b;
+  L4Run();
+}
+function L4Run() {
+  const k = [];
+  for (let i = 0; i < 9; i++) { const v = parseFloat(document.getElementById('L4K'+i).value); k.push(isNaN(v)?0:v); }
+  const d = parseInt(document.getElementById('L4D').value) || 1;
+  const b = parseInt(document.getElementById('L4B').value) || 0;
+  const out = applyConvolution(IMG.meme, k, d, b);
+  document.getElementById('L4Out').getContext('2d').putImageData(out, 0, 0);
+}
+
+// ============================================================
+// L5 HSL 葉色
+// ============================================================
+const L5_LEAVES = [
+  { h: 95, s: 0.45, l: 0.42, name: '健康闊葉' },
+  { h: 60, s: 0.65, l: 0.50, name: '嫩芽黃綠' },
+  { h: 140, s: 0.50, l: 0.28, name: '深綠老葉' },
+  { h: 15, s: 0.70, l: 0.42, name: '紅楓' },
+  { h: 35, s: 0.55, l: 0.40, name: '秋黃' },
+  { h: 160, s: 0.35, l: 0.30, name: '松針深綠' },
+  { h: 50, s: 0.75, l: 0.55, name: '銀杏黃' },
+  { h: 5, s: 0.40, l: 0.35, name: '枯葉褐紅' }
+];
+let _L5tgt;
+function initL5() {
+  L5NewTarget();
+  ['L5H','L5S','L5L'].forEach(id => document.getElementById(id).addEventListener('input', L5Update));
+}
+function L5NewTarget() {
+  _L5tgt = L5_LEAVES[Math.floor(Math.random() * L5_LEAVES.length)];
+  drawLeafL5('L5Tgt', _L5tgt.h, _L5tgt.s, _L5tgt.l);
+  document.getElementById('L5TgtName').textContent = '目標：' + _L5tgt.name;
+  L5Update();
+}
+function L5Update() {
+  const h = parseInt(document.getElementById('L5H').value);
+  const s = parseInt(document.getElementById('L5S').value);
+  const l = parseInt(document.getElementById('L5L').value);
+  document.getElementById('L5Hv').textContent = h;
+  document.getElementById('L5Sv').textContent = s;
+  document.getElementById('L5Lv').textContent = l;
+  const [r,g,b] = hsl2rgb(h, s/100, l/100).map(v => Math.round(v));
+  document.getElementById('L5HslCode').textContent = 'hsl(' + h + ',' + s + '%,' + l + '%) → RGB(' + r + ',' + g + ',' + b + ')';
+  drawLeafL5('L5You', h, s/100, l/100);
+  const [tr, tg, tb] = hsl2rgb(_L5tgt.h, _L5tgt.s, _L5tgt.l);
+  const d = Math.sqrt((r-tr)**2 + (g-tg)**2 + (b-tb)**2);
+  const m = Math.max(0, Math.round(100 - d * 0.5));
+  const el = document.getElementById('L5Match');
+  el.textContent = m;
+  el.style.color = m >= 80 ? '#4ab87e' : m >= 60 ? '#d4a04a' : '#b85a4a';
+}
+function drawLeafL5(id, h, s, l) {
+  const c = document.getElementById(id); const ctx = c.getContext('2d');
+  ctx.fillStyle = '#0a0a18'; ctx.fillRect(0, 0, c.width, c.height);
+  ctx.fillStyle = 'hsl(' + h + ',' + (s*100) + '%,' + (l*100) + '%)';
+  ctx.beginPath();
+  const cx = c.width/2, cy = c.height/2;
+  for (let i = 0; i <= 360; i += 2) {
+    const a = i * Math.PI / 180;
+    const r = 70 + 25*Math.cos(2*a) - 12*Math.sin(a);
+    const x = cx + r*Math.cos(a), y = cy + r*Math.sin(a)*1.3;
+    if (i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  }
+  ctx.closePath(); ctx.fill();
+  ctx.strokeStyle = 'hsl(' + h + ',' + (s*100) + '%,' + Math.max(5,l*100-15) + '%)';
+  ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(cx, cy-80); ctx.lineTo(cx, cy+80);
+  for (let dy = -50; dy <= 50; dy += 22) {
+    ctx.moveTo(cx, cy+dy); ctx.quadraticCurveTo(cx+18, cy+dy+7, cx+42, cy+dy+13);
+    ctx.moveTo(cx, cy+dy); ctx.quadraticCurveTo(cx-18, cy+dy+7, cx-42, cy+dy+13);
+  }
+  ctx.stroke();
+}
+</script>
+
+</body>
+</html>
