@@ -1,0 +1,708 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<title>遙感探測與實習 — 特徵強化請作答</title>
+<style>
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: "Noto Sans TC", "Microsoft JhengHei", sans-serif;
+  background: #0f1419;
+  color: #e6e6e6;
+  line-height: 1.6;
+}
+header {
+  background: linear-gradient(135deg, #1a3a52, #2c5f7c);
+  padding: 18px 28px;
+  border-bottom: 2px solid #4a8db8;
+  position: sticky; top: 0; z-index: 100;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.5);
+}
+header h1 {
+  margin: 0 0 10px 0;
+  font-size: 22px;
+  letter-spacing: 1px;
+  color: #fff;
+}
+nav { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+nav button, nav a.nav-link {
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  color: #d4e6f0;
+  padding: 8px 16px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 14px;
+  text-decoration: none;
+  display: inline-block;
+}
+nav button:hover, nav a.nav-link:hover { background: rgba(255,255,255,0.18); }
+nav button.active { background: #4a8db8; border-color: #6bb6db; color: #fff; box-shadow: 0 0 12px rgba(107,182,219,0.4); }
+
+#userBar {
+  margin-left: auto;
+  color: #b8d4e0;
+  font-size: 13px;
+}
+#userBar .name { color: #fff; font-weight: bold; }
+#userBar .timer { color: #6bb6db; font-weight: bold; margin-left: 12px; }
+
+main { padding: 24px 28px; max-width: 1400px; margin: 0 auto; }
+section.page { display: none; animation: fade .25s ease; }
+section.page.active { display: block; }
+@keyframes fade { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+
+h2 { color: #6bb6db; border-bottom: 1px solid #2a4a5e; padding-bottom: 8px; }
+h3 { color: #9bd1eb; margin-top: 24px; }
+
+.panel {
+  background: #1a2530;
+  border: 1px solid #2a3a4a;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+}
+.panel h4 { margin: 0 0 12px 0; color: #9bd1eb; font-size: 14px; letter-spacing: 1px; text-transform: uppercase; }
+
+/* === 報到頁 === */
+.checkin {
+  max-width: 480px;
+  margin: 60px auto;
+  background: #1a2530;
+  border: 1px solid #2a4055;
+  border-radius: 12px;
+  padding: 40px;
+  text-align: center;
+}
+.checkin h2 { border: none; font-size: 24px; }
+.checkin input {
+  width: 100%;
+  background: #0f1a24;
+  border: 1px solid #2a4055;
+  color: #fff;
+  padding: 12px 16px;
+  border-radius: 6px;
+  font-size: 15px;
+  margin: 8px 0;
+  font-family: inherit;
+}
+.checkin button {
+  width: 100%;
+  background: #4ab87e;
+  border: none;
+  color: #fff;
+  padding: 14px;
+  border-radius: 6px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  margin-top: 16px;
+}
+.checkin button:hover { background: #5ec88c; }
+.checkin button:disabled { background: #3a4a5a; cursor: not-allowed; }
+
+/* === 關卡卡片 === */
+.levels {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 10px;
+  margin: 20px 0;
+}
+.level-card {
+  background: #1a2530;
+  border: 2px solid #2a3a4a;
+  border-radius: 10px;
+  padding: 16px 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all .15s;
+  position: relative;
+}
+.level-card .ico { font-size: 32px; }
+.level-card .num { font-size: 11px; color: #6bb6db; font-weight: bold; letter-spacing: 2px; margin-top: 4px; }
+.level-card .title { font-size: 13px; color: #d4e6f0; margin-top: 4px; }
+.level-card .status { font-size: 10px; margin-top: 8px; padding: 3px 8px; border-radius: 10px; display: inline-block; }
+
+.level-card.locked { opacity: 0.4; cursor: not-allowed; border-color: #2a3a4a; }
+.level-card.locked .status { background: #2a3a4a; color: #8aa5b5; }
+
+.level-card.available { border-color: #4a8db8; }
+.level-card.available:hover { background: #1f3040; border-color: #6bb6db; transform: translateY(-2px); }
+.level-card.available .status { background: rgba(74,141,184,0.3); color: #9bd1eb; }
+
+.level-card.current { border-color: #d4a04a; box-shadow: 0 0 12px rgba(212,160,74,0.3); }
+.level-card.current .status { background: rgba(212,160,74,0.3); color: #d4a04a; }
+
+.level-card.done { border-color: #4ab87e; }
+.level-card.done .status { background: rgba(74,184,126,0.3); color: #4ab87e; }
+.level-card.done .ico::after { content: ' ✓'; color: #4ab87e; }
+
+/* === 關卡內容 === */
+.level-detail { margin-top: 24px; }
+.level-detail .theory {
+  background: rgba(74,141,184,0.08);
+  border-left: 4px solid #6bb6db;
+  padding: 16px 20px;
+  border-radius: 0 8px 8px 0;
+  margin-bottom: 16px;
+}
+.level-detail .theory h3 { margin-top: 0; }
+.challenge {
+  background: linear-gradient(135deg, #2a1a3a, #2a2a5a);
+  border: 2px solid #6b5acb;
+  border-radius: 10px;
+  padding: 20px;
+}
+.challenge h3 { color: #c5b5ff; margin-top: 0; }
+.challenge .goal {
+  background: rgba(107,90,203,0.15);
+  border-left: 3px solid #c5b5ff;
+  padding: 10px 16px;
+  margin-bottom: 16px;
+  border-radius: 0 4px 4px 0;
+}
+
+.layout {
+  display: grid;
+  grid-template-columns: 320px 1fr;
+  gap: 20px;
+  margin-top: 12px;
+}
+
+.canvas-wrap {
+  background: #000;
+  border-radius: 8px;
+  padding: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: 200px;
+}
+canvas { display: block; max-width: 100%; height: auto; image-rendering: pixelated; }
+
+.control-row { margin-bottom: 14px; }
+.control-row label { display: block; font-size: 13px; color: #b8d4e0; margin-bottom: 4px; }
+.control-row .value { color: #6bb6db; font-weight: bold; margin-left: 6px; }
+input[type=range] { width: 100%; accent-color: #6bb6db; }
+select, input[type=text], input[type=number] {
+  width: 100%;
+  background: #0f1a24;
+  border: 1px solid #2a4055;
+  color: #e6e6e6;
+  padding: 6px 10px;
+  border-radius: 4px;
+  font-size: 13px;
+  font-family: inherit;
+}
+button.btn {
+  background: #4a8db8; border: none; color: #fff;
+  padding: 10px 16px; border-radius: 4px; cursor: pointer;
+  font-size: 13px; margin-right: 6px; margin-top: 4px;
+}
+button.btn:hover { background: #5ea1cc; }
+button.btn:disabled { background: #3a4a5a; cursor: not-allowed; }
+button.btn.success { background: #4ab87e; }
+button.btn.success:hover { background: #5ec88c; }
+button.btn.danger { background: #b85a4a; }
+button.btn.big { padding: 14px 30px; font-size: 15px; font-weight: bold; }
+
+.score-display {
+  font-size: 32px; text-align: center; padding: 16px;
+  border-radius: 8px; margin-top: 16px;
+  background: #0f1a24;
+}
+.score-display.pass { color: #4ab87e; background: rgba(74,184,126,0.15); border: 1px solid #4ab87e; }
+.score-display.almost { color: #d4a04a; background: rgba(212,160,74,0.15); border: 1px solid #d4a04a; }
+.score-display.fail { color: #b85a4a; background: rgba(184,90,74,0.15); border: 1px solid #b85a4a; }
+
+.hint {
+  background: rgba(212,160,74,0.1);
+  border-left: 3px solid #d4a04a;
+  padding: 10px 14px;
+  margin: 10px 0;
+  font-size: 13px;
+  border-radius: 0 4px 4px 0;
+  color: #e5d0a8;
+}
+
+.split-view {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* === 排行榜 === */
+.leaderboard {
+  background: #1a2530;
+  border-radius: 8px;
+  overflow: hidden;
+  margin-top: 16px;
+}
+.leaderboard table { width: 100%; border-collapse: collapse; }
+.leaderboard th { background: #1a3a52; padding: 12px 10px; text-align: left; color: #9bd1eb; font-size: 13px; }
+.leaderboard td { padding: 10px; border-top: 1px solid #2a3a4a; font-size: 13px; }
+.leaderboard tr.done td { background: rgba(74,184,126,0.05); }
+.leaderboard tr:hover td { background: rgba(107,182,219,0.08); }
+.lb-rank { font-weight: bold; color: #d4a04a; }
+.lb-rank.gold { color: #ffd700; }
+.lb-rank.silver { color: #c0c0c0; }
+.lb-rank.bronze { color: #cd7f32; }
+.lb-levels { font-family: monospace; letter-spacing: 1px; }
+
+/* === 設定頁 === */
+.setup-section {
+  background: #1a2530;
+  border-radius: 8px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+.setup-section h3 { margin-top: 0; }
+.setup-section ol { line-height: 1.8; }
+.setup-section code {
+  background: #0a1218; color: #9bd1eb;
+  padding: 2px 6px; border-radius: 3px; font-family: Consolas, monospace;
+}
+
+footer {
+  text-align: center; padding: 20px;
+  color: #5a7080; font-size: 12px;
+  border-top: 1px solid #2a3a4a; margin-top: 30px;
+}
+
+.notice {
+  background: rgba(184,90,74,0.12);
+  border-left: 3px solid #b85a4a;
+  padding: 12px 16px;
+  border-radius: 0 4px 4px 0;
+  margin: 12px 0;
+  color: #e5b3a8;
+}
+
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 8px;
+  margin: 12px 0;
+}
+.stat-box {
+  background: #0f1a24;
+  padding: 10px 14px;
+  border-radius: 6px;
+  border-left: 3px solid #6bb6db;
+}
+.stat-box .label { font-size: 11px; color: #8aa5b5; }
+.stat-box .val { font-size: 18px; color: #fff; font-weight: bold; }
+
+.warn-text { color: #d4a04a; font-size: 12px; margin-top: 4px; }
+
+.colorbar { height: 16px; border-radius: 4px; margin: 8px 0 4px 0; border: 1px solid #2a4055; }
+.colorbar-labels { display: flex; justify-content: space-between; font-size: 11px; color: #8aa5b5; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🌳 遙感探測與實習 · 特徵強化請作答</h1>
+  <div style="font-size:12px;color:#9bd1eb;margin-bottom:8px">國立中興大學 森林學系 · 大三 · 授課老師：大Q</div>
+  <nav>
+    <button class="nav-btn active" data-page="quest">📝 請作答</button>
+    <a class="nav-link" href="lab.html">🎮 練習園地</a>
+    <button class="nav-btn" data-page="leaderboard">🏅 排行榜</button>
+    <button class="nav-btn" data-page="setup">⚙️ 設定</button>
+    <div id="userBar"></div>
+  </nav>
+</header>
+
+<main>
+
+<section id="page-quest" class="page active">
+  <div id="questContent"></div>
+</section>
+
+<section id="page-leaderboard" class="page">
+  <h2>🏅 排行榜</h2>
+  <p>所有同學的作答進度。完成者依完成時間排序；未完成依關卡數排序。</p>
+  <button class="btn" onclick="loadLeaderboard()">🔄 重新整理</button>
+  <div id="leaderboardContent" class="leaderboard">
+    <div style="padding:40px;text-align:center;color:#8aa5b5">點擊「重新整理」載入資料</div>
+  </div>
+</section>
+
+<section id="page-setup" class="page">
+  <h2>⚙️ 設定</h2>
+
+  <div class="setup-section">
+    <h3>📡 Google Sheet Web App URL（老師設定一次）</h3>
+    <p>把 Apps Script 部署後得到的 URL 貼到下面，按儲存。所有同學使用同一個 URL。</p>
+    <input type="text" id="webAppUrl" placeholder="https://script.google.com/macros/s/AKfycb.../exec" style="font-family:monospace;font-size:12px">
+    <div style="margin-top:8px">
+      <button class="btn" onclick="saveWebAppUrl()">💾 儲存</button>
+      <button class="btn" onclick="testWebApp()">🔬 測試連線</button>
+    </div>
+    <div id="webAppStatus" style="margin-top:10px;font-size:13px"></div>
+  </div>
+
+  <div class="setup-section">
+    <h3>👤 本機資料</h3>
+    <div id="localState"></div>
+    <button class="btn danger" onclick="clearProgress()">🗑️ 清空本機進度（重新報到）</button>
+  </div>
+
+  <div class="setup-section">
+    <h3>📖 老師部署教學</h3>
+    <ol>
+      <li>打開 Google 試算表 → 上方功能表 <code>擴充功能 → Apps Script</code></li>
+      <li>已自動準備好「RS_FeatureEnhancement_Quest」專案，<strong>程式碼已貼好</strong></li>
+      <li>右上角點 <code>部署 → 新增部署作業</code></li>
+      <li>類型選 <code>網頁應用程式</code></li>
+      <li>說明任填、<strong>執行身分：我（你的 email）</strong>、<strong>存取權：任何人</strong></li>
+      <li>按「部署」→ 跳出授權視窗 → 選你的帳號 → <code>進階 → 前往 RS_FeatureEnhancement_Quest（不安全）</code> → <code>允許</code></li>
+      <li>複製給出的 <code>網頁應用程式 URL</code></li>
+      <li>貼回上方「Web App URL」欄位 → 按儲存</li>
+    </ol>
+    <div class="notice">⚠️ 第一次「進階 → 允許」是必要的，因為 Apps Script 需要存取你的試算表權限。完成後 URL 就可以給全班用。</div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  國立中興大學 森林學系 · 遙感探測與實習 · 大Q | 全部運算於瀏覽器本地進行
+</footer>
+
+<script src="assets.js"></script>
+<script src="core.js"></script>
+<script>
+// ============================================================
+// 全域狀態 + localStorage
+// ============================================================
+const STORAGE_KEY = 'rsfe_quest_v2';
+const DEFAULT_WEBAPP_URL = 'https://script.google.com/macros/s/AKfycbyXtX_Z8bniRaOGWherLTAUpEDCxypUSIB9uWyR-OB6LvDAdIHmw2yIXiDj0t6UA5FUaw/exec';
+let APP = {
+  studentId: null,
+  studentName: null,
+  startTime: null,
+  webAppUrl: DEFAULT_WEBAPP_URL,
+  unlockedLevel: 1,
+  levelTimes: [null, null, null, null, null],
+  levelScores: [null, null, null, null, null],
+  currentLevel: null
+};
+
+function loadState() {
+  try {
+    const s = localStorage.getItem(STORAGE_KEY);
+    if (s) APP = Object.assign(APP, JSON.parse(s));
+  } catch (e) {}
+}
+function saveState() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(APP)); } catch (e) {}
+}
+
+// ============================================================
+// Sheet API client
+// ============================================================
+async function sheetCall(payload) {
+  if (!APP.webAppUrl) return { error: '尚未設定 Web App URL' };
+  try {
+    const res = await fetch(APP.webAppUrl, {
+      method: 'POST',
+      headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+      body: JSON.stringify(payload),
+      redirect: 'follow'
+    });
+    return await res.json();
+  } catch (e) {
+    return { error: String(e) };
+  }
+}
+
+// ============================================================
+// 導航
+// ============================================================
+document.querySelectorAll('.nav-btn').forEach(b => {
+  b.addEventListener('click', () => switchPage(b.dataset.page));
+});
+function switchPage(id) {
+  document.querySelectorAll('section.page').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  document.querySelector(`.nav-btn[data-page="${id}"]`)?.classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+  if (id === 'setup') renderSetup();
+  if (id === 'leaderboard') loadLeaderboard();
+}
+
+// ============================================================
+// 報到頁 + 作答主頁
+// ============================================================
+function renderQuest() {
+  const container = document.getElementById('questContent');
+  if (!APP.studentId) {
+    container.innerHTML = `
+      <div class="checkin">
+        <h2>📝 報到</h2>
+        <p style="color:#8aa5b5">輸入你的學號與姓名開始作答</p>
+        <input type="text" id="inputId" placeholder="學號" autocomplete="off">
+        <input type="text" id="inputName" placeholder="姓名" autocomplete="off">
+        <button id="checkinBtn" onclick="checkIn()">🚀 開始作答</button>
+        <div id="checkinStatus" style="margin-top:10px;font-size:13px"></div>
+        <div style="margin-top:20px;font-size:11px;color:#5a7080">
+          ${APP.webAppUrl ? '✓ 已連線 Sheet' : '⚠ 未設定 Sheet（純本機模式，進度不會上傳）'}
+        </div>
+      </div>
+    `;
+    return;
+  }
+
+  const levels = LEVEL_DEFS.map((lv, i) => {
+    const num = i + 1;
+    const done = APP.levelTimes[i] !== null;
+    const unlocked = num <= APP.unlockedLevel;
+    const current = APP.currentLevel === num;
+    let cls = 'locked';
+    if (done) cls = 'done';
+    else if (current) cls = 'current';
+    else if (unlocked) cls = 'available';
+    let statusText = '🔒 鎖定';
+    if (done) statusText = '✓ 已過 · ' + (APP.levelScores[i] || 0) + '分';
+    else if (current) statusText = '⏳ 進行中';
+    else if (unlocked) statusText = '可作答';
+    return `
+      <div class="level-card ${cls}" onclick="${unlocked?`selectLevel(${num})`:''}">
+        <div class="ico">${lv.icon}</div>
+        <div class="num">L${num}</div>
+        <div class="title">${lv.title}</div>
+        <div class="status">${statusText}</div>
+      </div>
+    `;
+  }).join('');
+
+  const allDone = APP.levelTimes.every(t => t !== null);
+
+  container.innerHTML = `
+    <h2>🎯 你的作答之旅</h2>
+    <div class="levels">${levels}</div>
+    ${allDone ? `
+      <div class="panel" style="background:linear-gradient(135deg,#1a4030,#2a5040);border-color:#4ab87e;text-align:center">
+        <h3 style="color:#5ec88c">🎉 全部關卡完成！</h3>
+        <p>請截圖整個畫面（包含排行榜頁）給老師，可以下課了。</p>
+        <button class="btn success big" onclick="finishAll()">📤 提交結業</button>
+      </div>
+    ` : ''}
+    <div id="levelDetail" class="level-detail"></div>
+  `;
+
+  if (APP.currentLevel && APP.currentLevel <= 5) {
+    renderLevel(APP.currentLevel);
+  }
+}
+
+const LEVEL_DEFS = [];
+
+function selectLevel(n) {
+  APP.currentLevel = n;
+  saveState();
+  renderQuest();
+  setTimeout(() => {
+    document.getElementById('levelDetail')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }, 100);
+}
+
+function renderLevel(n) {
+  const lv = LEVEL_DEFS[n - 1];
+  if (!lv) return;
+  const cont = document.getElementById('levelDetail');
+  cont.innerHTML = `
+    <div class="theory">
+      <h3>${lv.icon} L${n} · ${lv.title}</h3>
+      <div>${lv.theory}</div>
+    </div>
+    <div class="challenge">
+      <h3>🎯 挑戰任務</h3>
+      <div class="goal">${lv.goal}</div>
+      <div id="challengeBody"></div>
+    </div>
+  `;
+  lv.render();
+}
+
+async function checkIn() {
+  const id = document.getElementById('inputId').value.trim();
+  const name = document.getElementById('inputName').value.trim();
+  const status = document.getElementById('checkinStatus');
+  if (!id || !name) { status.innerHTML = '<span style="color:#ff6b6b">請輸入學號與姓名</span>'; return; }
+  status.innerHTML = '<span style="color:#8aa5b5">⏳ 報到中...</span>';
+  document.getElementById('checkinBtn').disabled = true;
+
+  APP.studentId = id;
+  APP.studentName = name;
+  APP.startTime = Date.now();
+  APP.unlockedLevel = 1;
+  APP.levelTimes = [null,null,null,null,null];
+  APP.currentLevel = 1;
+  saveState();
+
+  if (APP.webAppUrl) {
+    const r = await sheetCall({ action: 'recordStart', id: id, name: name });
+    if (r.error) status.innerHTML = `<span style="color:#d4a04a">⚠ 已開始（Sheet 同步失敗：${r.error}）</span>`;
+    else status.innerHTML = '<span style="color:#4ab87e">✓ 報到成功</span>';
+  } else {
+    status.innerHTML = '<span style="color:#d4a04a">✓ 已開始（純本機，未設定 Sheet）</span>';
+  }
+  setTimeout(() => { renderQuest(); updateUserBar(); }, 800);
+}
+
+// 過關邏輯已移至 levels.js 的 submitLevel()
+
+
+async function finishAll() {
+  if (APP.webAppUrl) {
+    const r = await sheetCall({ action: 'recordFinish', id: APP.studentId });
+    if (r.ok) alert(`🎓 已提交！總耗時 ${formatDuration(r.totalSeconds)}`);
+    else alert('提交失敗：' + (r.error || '未知錯誤'));
+  } else {
+    const sec = Math.round((Date.now() - APP.startTime) / 1000);
+    alert(`🎓 結業！總耗時 ${formatDuration(sec)}（本機模式，未上傳）`);
+  }
+  switchPage('leaderboard');
+}
+
+function updateUserBar() {
+  const bar = document.getElementById('userBar');
+  if (!APP.studentId) { bar.innerHTML = ''; return; }
+  const done = APP.levelTimes.filter(t => t !== null).length;
+  const totalScore = APP.levelScores.reduce((a,b) => a + (b||0), 0);
+  bar.innerHTML = `
+    <span class="name">${APP.studentName}</span>
+    <span style="color:#8aa5b5">(${APP.studentId})</span>
+    <span style="margin-left:12px">題目：${done}/5</span>
+    <span style="margin-left:12px;color:#d4a04a">總分：${totalScore}</span>
+    <span class="timer" id="elapsedTimer">—</span>
+  `;
+}
+setInterval(() => {
+  if (!APP.startTime || !APP.studentId) return;
+  const el = document.getElementById('elapsedTimer');
+  if (el) el.textContent = formatDuration(Math.round((Date.now() - APP.startTime) / 1000));
+}, 1000);
+
+function renderSetup() {
+  document.getElementById('webAppUrl').value = APP.webAppUrl || '';
+  const ls = document.getElementById('localState');
+  if (APP.studentId) {
+    const done = APP.levelTimes.filter(t => t !== null).length;
+    ls.innerHTML = `
+      <p>姓名：<strong>${APP.studentName}</strong> · 學號：<code>${APP.studentId}</code></p>
+      <p>已開始：${new Date(APP.startTime).toLocaleString('zh-TW')}</p>
+      <p>關卡進度：${done}/5</p>
+    `;
+  } else {
+    ls.innerHTML = '<p style="color:#8aa5b5">尚未報到</p>';
+  }
+}
+function saveWebAppUrl() {
+  const url = document.getElementById('webAppUrl').value.trim();
+  APP.webAppUrl = url || null;
+  saveState();
+  document.getElementById('webAppStatus').innerHTML = '<span style="color:#4ab87e">✓ 已儲存</span>';
+}
+async function testWebApp() {
+  const url = document.getElementById('webAppUrl').value.trim();
+  if (!url) { document.getElementById('webAppStatus').innerHTML = '<span style="color:#ff6b6b">請先輸入 URL</span>'; return; }
+  APP.webAppUrl = url;
+  document.getElementById('webAppStatus').innerHTML = '<span style="color:#8aa5b5">⏳ 測試中...</span>';
+  try {
+    const res = await fetch(url + '?action=ping');
+    const j = await res.json();
+    if (j.ok) {
+      document.getElementById('webAppStatus').innerHTML = `<span style="color:#4ab87e">✓ 連線成功！伺服器時間 ${j.time}</span>`;
+      saveState();
+    } else {
+      document.getElementById('webAppStatus').innerHTML = `<span style="color:#ff6b6b">⚠ 回應異常：${JSON.stringify(j)}</span>`;
+    }
+  } catch (e) {
+    document.getElementById('webAppStatus').innerHTML = `<span style="color:#ff6b6b">⚠ 連線失敗：${e.message}<br>確認 URL 是否正確、Apps Script 部署時「存取權」是否設為「任何人」</span>`;
+  }
+}
+function clearProgress() {
+  if (!confirm('確定要清空本機進度嗎？這只會清掉本機資料，不會影響 Sheet 上的紀錄。')) return;
+  const url = APP.webAppUrl;
+  APP = { studentId: null, studentName: null, startTime: null,
+          webAppUrl: url, unlockedLevel: 1, levelTimes: [null,null,null,null,null], currentLevel: null };
+  saveState();
+  renderSetup();
+  renderQuest();
+  updateUserBar();
+  switchPage('quest');
+}
+
+async function loadLeaderboard() {
+  const cont = document.getElementById('leaderboardContent');
+  cont.innerHTML = '<div style="padding:40px;text-align:center;color:#8aa5b5">⏳ 載入中...</div>';
+  if (!APP.webAppUrl) {
+    cont.innerHTML = '<div style="padding:40px;text-align:center;color:#d4a04a">尚未設定 Web App URL</div>';
+    return;
+  }
+  const r = await sheetCall({ action: 'getLeaderboard' });
+  if (r.error || !r.leaderboard) {
+    cont.innerHTML = `<div style="padding:40px;text-align:center;color:#ff6b6b">載入失敗：${r.error || 'unknown'}</div>`;
+    return;
+  }
+  // 解析每關的 "時間 | 分數" 格式
+  function parseLevel(s) {
+    if (!s) return { time: null, score: null };
+    const m = String(s).match(/^(.+?)\s*\|\s*(\d+)$/);
+    if (m) return { time: m[1].trim(), score: parseInt(m[2]) };
+    return { time: String(s), score: null };
+  }
+  const rows = r.leaderboard.map((s, i) => {
+    const rank = i + 1;
+    let rankCls = '';
+    if (rank === 1) rankCls = 'gold';
+    else if (rank === 2) rankCls = 'silver';
+    else if (rank === 3) rankCls = 'bronze';
+    const parsed = s.levels.map(parseLevel);
+    const totalScore = parsed.reduce((a,p) => a + (p.score || 0), 0);
+    const levelsHtml = parsed.map(p => {
+      if (!p.time) return '<span style="color:#5a7080">·</span>';
+      if (p.score !== null) return `<span style="color:#4ab87e" title="${p.time}">${p.score}</span>`;
+      return '<span style="color:#4ab87e">✓</span>';
+    }).join(' ');
+    const totalTime = s.totalSec ? formatDuration(s.totalSec) : '—';
+    return `
+      <tr class="${s.status === 'done' ? 'done' : ''}">
+        <td><span class="lb-rank ${rankCls}">#${rank}</span></td>
+        <td><strong>${s.name}</strong></td>
+        <td>${s.id}</td>
+        <td class="lb-levels">${levelsHtml}</td>
+        <td style="color:#d4a04a;font-weight:bold">${totalScore}</td>
+        <td>${totalTime}</td>
+        <td>${s.status === 'done' ? '✓ 完成' : s.status === 'inprogress' ? '進行中' : s.status}</td>
+      </tr>
+    `;
+  }).join('');
+  cont.innerHTML = `
+    <table>
+      <thead><tr><th>名次</th><th>姓名</th><th>學號</th><th>L1 L2 L3 L4 L5 分數</th><th>總分</th><th>總時間</th><th>狀態</th></tr></thead>
+      <tbody>${rows || '<tr><td colspan="7" style="padding:30px;text-align:center;color:#8aa5b5">尚無資料</td></tr>'}</tbody>
+    </table>
+  `;
+}
+
+loadState();
+loadAllAssets()
+  .then(() => {
+    if (typeof defineLevels === 'function') defineLevels();
+    renderQuest();
+    updateUserBar();
+  })
+  .catch(err => {
+    document.body.innerHTML = '<div style="padding:40px;color:#ff6b6b">⚠ 影像載入失敗：' + err.message + '<br><br>請確認 index.html、core.js、assets/ 在同一個資料夾，並用 Chrome / Edge 直接打開。</div>';
+  });
+</script>
+<script src="levels.js"></script>
+
+</body>
+</html>
