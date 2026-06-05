@@ -29,7 +29,7 @@ h3 { color: #b89bdb; margin-top: 24px; }
 .checkin button { width: 100%; background: #8a4ab8; border: none; color: #fff; padding: 14px; border-radius: 6px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 16px; }
 .checkin button:hover { background: #9c5ed0; }
 .checkin button:disabled { background: #3a3a5a; cursor: not-allowed; }
-.levels { display: grid; grid-template-columns: repeat(5, 1fr); gap: 10px; margin: 20px 0; }
+.levels { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin: 20px 0; }
 .level-card { background: #1a1a30; border: 2px solid #3a2a4a; border-radius: 10px; padding: 16px 12px; text-align: center; cursor: pointer; transition: all .15s; }
 .level-card .ico { font-size: 32px; }
 .level-card .num { font-size: 11px; color: #b89bdb; font-weight: bold; letter-spacing: 2px; margin-top: 4px; }
@@ -88,16 +88,29 @@ footer { text-align: center; padding: 20px; color: #5a5070; font-size: 12px; bor
 .matrix-display { display: grid; gap: 1px; background: #2a2a4a; padding: 2px; border-radius: 4px; }
 .matrix-cell { width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; font-size: 10px; font-family: monospace; }
 .feature-map-grid { display: grid; gap: 8px; }
+.site-nav { background:#0a0a18; padding:8px 16px; font-size:12px; border-bottom:1px solid #3a2a4a; display:flex; gap:6px; flex-wrap:wrap; align-items:center; font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif; }
+.site-nav .lab { color:#8a8aa5; font-weight:bold; margin-right:4px; }
+.site-nav a { color:#c5b6db; text-decoration:none; padding:4px 10px; border-radius:4px; background:rgba(197,182,219,0.08); }
+.site-nav a:hover { background:rgba(197,182,219,0.20); }
+.site-nav a.cur { background:#4ab87e; color:#fff; }
 </style>
 </head>
 <body>
+
+<div class="site-nav">
+  <span class="lab">📚 教材導覽</span>
+  <a href="../index.html">🌳 特徵強化請作答</a>
+  <a href="../demo/index.html">🎓 特徵強化示範</a>
+  <a href="../lab.html">🔬 自由探索</a>
+  <a href="index.html" class="cur">🧠 CNN 請作答</a>
+  <a href="demo/index.html">🎨 CNN 示範</a>
+</div>
 
 <header>
   <h1>🧠 CNN 與類神經網路 · 請作答</h1>
   <div style="font-size:12px;color:#c5b6db;margin-bottom:8px">國立中興大學 森林學系 · 大三 · 遙感探測與實習 · 大Q</div>
   <nav>
     <button class="nav-btn active" data-page="quest">📝 請作答</button>
-    <a class="nav-link" href="../index.html">← 上一單元：特徵強化</a>
     <button class="nav-btn" data-page="leaderboard">🏅 排行榜</button>
     <button class="nav-btn" data-page="setup">⚙️ 設定</button>
     <div id="userBar"></div>
@@ -149,10 +162,21 @@ const QUEST_NAME = 'cnn';
 let APP = {
   studentId: null, studentName: null, startTime: null,
   webAppUrl: DEFAULT_WEBAPP_URL,
-  unlockedLevel: 1, levelTimes: [null,null,null,null,null],
-  levelScores: [null,null,null,null,null], currentLevel: null
+  unlockedLevel: 1, levelTimes: [null,null,null,null],
+  levelScores: [null,null,null,null], currentLevel: null
 };
-function loadState() { try { const s = localStorage.getItem(STORAGE_KEY); if (s) APP = Object.assign(APP, JSON.parse(s)); } catch(e){} }
+function loadState() {
+  try {
+    const s = localStorage.getItem(STORAGE_KEY);
+    if (s) APP = Object.assign(APP, JSON.parse(s));
+    // 相容舊版（5 關 → 現在 4 關）：把陣列截到 4 個元素
+    ['levelTimes','levelScores','levelStartTimes'].forEach(k => {
+      if (Array.isArray(APP[k]) && APP[k].length !== 4) APP[k] = APP[k].slice(0, 4).concat([null,null,null,null]).slice(0, 4);
+    });
+    if (APP.currentLevel && APP.currentLevel > 4) APP.currentLevel = null;
+    if (APP.unlockedLevel > 5) APP.unlockedLevel = 4;
+  } catch(e){}
+}
 function saveState() { try { localStorage.setItem(STORAGE_KEY, JSON.stringify(APP)); } catch(e){} }
 
 async function sheetCall(payload) {
@@ -206,14 +230,14 @@ function renderQuest() {
     <div class="levels">${levels}</div>
     ${allDone ? `<div class="panel" style="background:linear-gradient(135deg,#1a4030,#2a5040);border-color:#4ab87e;text-align:center"><h3 style="color:#5ec88c">🎉 CNN 單元全部完成！</h3><button class="btn success big" onclick="finishAll()">📤 提交結業</button></div>` : ''}
     <div id="levelDetail" class="level-detail"></div>`;
-  if (APP.currentLevel && APP.currentLevel <= 5) renderLevel(APP.currentLevel);
+  if (APP.currentLevel && APP.currentLevel <= 4) renderLevel(APP.currentLevel);
 }
 
-function selectLevel(n) { APP.currentLevel = n; saveState(); renderQuest(); setTimeout(()=>document.getElementById('levelDetail')?.scrollIntoView({behavior:'smooth',block:'start'}),100); }
+function selectLevel(n) { if (!APP.levelStartTimes) APP.levelStartTimes = [null,null,null,null]; if (APP.levelStartTimes[n-1] === null) APP.levelStartTimes[n-1] = Date.now(); APP.currentLevel = n; saveState(); renderQuest(); setTimeout(()=>document.getElementById('levelDetail')?.scrollIntoView({behavior:'smooth',block:'start'}),100); }
 function renderLevel(n) {
   const lv = LEVEL_DEFS[n-1]; if (!lv) return;
   const cont = document.getElementById('levelDetail');
-  cont.innerHTML = `<div class="theory"><h3>${lv.icon} L${n} · ${lv.title}</h3><div>${lv.theory}</div></div><div class="challenge"><h3>🎯 挑戰任務</h3><div class="goal">${lv.goal}</div><div id="challengeBody"></div></div>`;
+  cont.innerHTML = `<div class="theory"><h3>${lv.icon} L${n} · ${lv.title}</h3><div>${lv.theory}</div></div><div class="challenge"><h3>🎯 挑戰任務</h3><div class="goal">${lv.goal}</div><div id="hintBox_${n}">${renderHintBox(n)}</div><div id="challengeBody"></div></div>`;
   lv.render();
 }
 
@@ -225,7 +249,7 @@ async function checkIn() {
   status.innerHTML = '<span style="color:#8a8aa5">⏳ 報到中...</span>';
   document.getElementById('checkinBtn').disabled = true;
   APP.studentId = id; APP.studentName = name; APP.startTime = Date.now();
-  APP.unlockedLevel = 1; APP.levelTimes = [null,null,null,null,null]; APP.levelScores = [null,null,null,null,null]; APP.currentLevel = 1;
+  APP.unlockedLevel = 1; APP.levelTimes = [null,null,null,null]; APP.levelScores = [null,null,null,null]; APP.currentLevel = 1;
   saveState();
   if (APP.webAppUrl) {
     const r = await sheetCall({action:'recordStart', id:id, name:name});
@@ -250,7 +274,7 @@ function updateUserBar() {
   if (!APP.studentId) { bar.innerHTML = ''; return; }
   const done = APP.levelTimes.filter(t=>t!==null).length;
   const total = APP.levelScores.reduce((a,b)=>a+(b||0),0);
-  bar.innerHTML = `<span class="name">${APP.studentName}</span><span style="color:#8a8aa5">(${APP.studentId})</span><span style="margin-left:12px">題目：${done}/5</span><span style="margin-left:12px;color:#d4a04a">總分：${total}</span><span class="timer" id="elapsedTimer">—</span>`;
+  bar.innerHTML = `<span class="name">${APP.studentName}</span><span style="color:#8a8aa5">(${APP.studentId})</span><span style="margin-left:12px">題目：${done}/4</span><span style="margin-left:12px;color:#d4a04a">總分：${total}</span><span class="timer" id="elapsedTimer">—</span>`;
 }
 setInterval(() => { if (!APP.startTime||!APP.studentId) return; const el=document.getElementById('elapsedTimer'); if (el) el.textContent = formatDur(Math.round((Date.now()-APP.startTime)/1000)); }, 1000);
 function formatDur(s) { if (!s||isNaN(s)) return '-'; const m=Math.floor(s/60); return m + ':' + String(s%60).padStart(2,'0'); }
@@ -260,7 +284,7 @@ function renderSetup() {
   const ls = document.getElementById('localState');
   if (APP.studentId) {
     const done = APP.levelTimes.filter(t=>t!==null).length;
-    ls.innerHTML = `<p>姓名：<strong>${APP.studentName}</strong> · 學號：<code>${APP.studentId}</code></p><p>已開始：${new Date(APP.startTime).toLocaleString('zh-TW')}</p><p>進度：${done}/5</p>`;
+    ls.innerHTML = `<p>姓名：<strong>${APP.studentName}</strong> · 學號：<code>${APP.studentId}</code></p><p>已開始：${new Date(APP.startTime).toLocaleString('zh-TW')}</p><p>進度：${done}/4</p>`;
   } else { ls.innerHTML = '<p style="color:#8a8aa5">尚未報到</p>'; }
 }
 function saveWebAppUrl() { APP.webAppUrl = document.getElementById('webAppUrl').value.trim() || null; saveState(); document.getElementById('webAppStatus').innerHTML = '<span style="color:#4ab87e">✓ 已儲存</span>'; }
@@ -277,7 +301,7 @@ async function testWebApp() {
 function clearProgress() {
   if (!confirm('確定要清空本機進度嗎？')) return;
   const url = APP.webAppUrl;
-  APP = { studentId:null, studentName:null, startTime:null, webAppUrl:url, unlockedLevel:1, levelTimes:[null,null,null,null,null], levelScores:[null,null,null,null,null], currentLevel:null };
+  APP = { studentId:null, studentName:null, startTime:null, webAppUrl:url, unlockedLevel:1, levelTimes:[null,null,null,null], levelScores:[null,null,null,null], currentLevel:null };
   saveState(); renderSetup(); renderQuest(); updateUserBar(); switchPage('quest');
 }
 
@@ -295,7 +319,7 @@ async function loadLeaderboard() {
     const levHtml = parsed.map(p => !p.time ? '<span style="color:#5a5070">·</span>' : p.score !== null ? `<span style="color:#4ab87e">${p.score}</span>` : '<span style="color:#4ab87e">✓</span>').join(' ');
     return `<tr class="${s.status==='done'?'done':''}"><td><span class="lb-rank ${cls}">#${rank}</span></td><td><strong>${s.name}</strong></td><td>${s.id}</td><td style="font-family:monospace">${levHtml}</td><td style="color:#d4a04a;font-weight:bold">${total}</td><td>${s.totalSec?formatDur(s.totalSec):'—'}</td><td>${s.status==='done'?'✓ 完成':s.status==='inprogress'?'進行中':s.status}</td></tr>`;
   }).join('');
-  cont.innerHTML = `<table><thead><tr><th>名次</th><th>姓名</th><th>學號</th><th>L1-L5 分數</th><th>總分</th><th>時間</th><th>狀態</th></tr></thead><tbody>${rows || '<tr><td colspan="7" style="padding:30px;text-align:center;color:#8a8aa5">尚無資料</td></tr>'}</tbody></table>`;
+  cont.innerHTML = `<table><thead><tr><th>名次</th><th>姓名</th><th>學號</th><th>L1-L4 分數</th><th>總分</th><th>時間</th><th>狀態</th></tr></thead><tbody>${rows || '<tr><td colspan="7" style="padding:30px;text-align:center;color:#8a8aa5">尚無資料</td></tr>'}</tbody></table>`;
 }
 
 // ============================================================
@@ -318,11 +342,11 @@ async function submitLevel(lvNum) {
   if (score < lv.passThreshold) { msgEl.innerHTML = `<span style="color:#b85a4a">⚠ 分數 ${score} < ${lv.passThreshold}，未過關。繼續調整～</span>`; return; }
   const prev = APP.levelScores[lvNum-1] || 0; const isFirst = APP.levelTimes[lvNum-1] === null; const improved = score > prev;
   if (improved) APP.levelScores[lvNum-1] = score;
-  if (isFirst) { APP.levelTimes[lvNum-1] = Date.now(); if (lvNum+1 > APP.unlockedLevel) APP.unlockedLevel = lvNum+1; APP.currentLevel = lvNum < 5 ? lvNum+1 : null; }
+  if (isFirst) { APP.levelTimes[lvNum-1] = Date.now(); if (lvNum+1 > APP.unlockedLevel) APP.unlockedLevel = lvNum+1; APP.currentLevel = lvNum < 4 ? lvNum+1 : null; }
   saveState();
   if (APP.webAppUrl) sheetCall({action:'recordLevel', id:APP.studentId, level:lvNum, score:score});
   let txt;
-  if (isFirst) txt = `🎉 L${lvNum} 過關！分數 <strong>${score}</strong>${lvNum<5?' · 下一關已解鎖':' · 全部完成！'}`;
+  if (isFirst) txt = `🎉 L${lvNum} 過關！分數 <strong>${score}</strong>${lvNum<4?' · 下一關已解鎖':' · 全部完成！'}`;
   else if (improved) txt = `📈 分數從 ${prev} 提升到 <strong>${score}</strong>！`;
   else txt = `✓ 分數 ${score}（未超過 ${prev}）`;
   msgEl.innerHTML = `<span style="color:#4ab87e">${txt}</span>`;
@@ -407,6 +431,42 @@ window.addEventListener("load", () => {
   renderQuest();
   updateUserBar();
 });
+
+// ============================================================
+// 提示系統：每 10 分鐘解鎖一條提示
+// ============================================================
+function renderHintBox(n) {
+  const hints = (typeof getLevelHints === 'function') ? getLevelHints(n) : [];
+  if (hints.length === 0) return '';
+  const start = (APP.levelStartTimes && APP.levelStartTimes[n-1]) || Date.now();
+  const elapsedMin = (Date.now() - start) / 60000;
+  const shown = Math.min(hints.length, Math.floor(elapsedMin / 10));
+  let html = '<div style="background:rgba(212,160,74,0.10);border-left:3px solid #d4a04a;padding:12px 16px;margin:12px 0;border-radius:0 6px 6px 0;font-size:13px">';
+  html += '<div style="font-size:11px;color:#d4a04a;margin-bottom:6px;letter-spacing:1px">💡 提示系統（每 10 分鐘解鎖一條）</div>';
+  if (shown === 0) {
+    const next = Math.max(0, Math.ceil(10 - elapsedMin));
+    html += '<div style="color:#8aa5b5">🕒 還在思考中？再 <strong>' + next + '</strong> 分鐘會解鎖第 1 條提示。</div>';
+  } else {
+    for (let i = 0; i < shown; i++) {
+      html += '<div style="color:#e5d0a8;margin-bottom:6px"><strong>提示 ' + (i+1) + '：</strong>' + hints[i] + '</div>';
+    }
+    if (shown < hints.length) {
+      const nextAt = (shown + 1) * 10;
+      const remain = Math.max(0, Math.ceil(nextAt - elapsedMin));
+      html += '<div style="color:#5a7080;margin-top:8px;font-size:12px">🔒 下一條提示再 <strong>' + remain + '</strong> 分鐘解鎖。</div>';
+    } else {
+      html += '<div style="color:#4ab87e;margin-top:8px;font-size:12px">✓ 全部提示已解鎖。</div>';
+    }
+  }
+  return html + '</div>';
+}
+setInterval(() => {
+  const n = APP.currentLevel;
+  if (!n) return;
+  const box = document.getElementById('hintBox_' + n);
+  if (box) box.innerHTML = renderHintBox(n).replace(/^<div[^>]+>|<\/div>$/g, '');
+}, 30000);
+
 </script>
 <script src="levels_cnn.js"></script>
 

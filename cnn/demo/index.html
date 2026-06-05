@@ -70,28 +70,42 @@ button.btn.outline { background: transparent; border: 1px solid #c5b6db; color: 
 .sample-grid canvas { width: 100%; cursor: pointer; border-radius: 4px; border: 2px solid #3a2a4a; transition: all .15s; }
 .sample-grid canvas:hover { border-color: #c5b6db; transform: scale(1.02); }
 footer { text-align: center; padding: 20px; color: #5a5070; font-size: 12px; border-top: 1px solid #3a2a4a; margin-top: 30px; }
+.site-nav { background:#0a0a18; padding:8px 16px; font-size:12px; border-bottom:1px solid #3a2a4a; display:flex; gap:6px; flex-wrap:wrap; align-items:center; font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif; }
+.site-nav .lab { color:#8a8aa5; font-weight:bold; margin-right:4px; }
+.site-nav a { color:#c5b6db; text-decoration:none; padding:4px 10px; border-radius:4px; background:rgba(197,182,219,0.08); }
+.site-nav a:hover { background:rgba(197,182,219,0.20); }
+.site-nav a.cur { background:#4ab87e; color:#fff; }
 </style>
 </head>
 <body>
 
+<div class="site-nav">
+  <span class="lab">📚 教材導覽</span>
+  <a href="../../index.html">🌳 特徵強化請作答</a>
+  <a href="../../demo/index.html">🎓 特徵強化示範</a>
+  <a href="../../lab.html">🔬 自由探索</a>
+  <a href="../index.html">🧠 CNN 請作答</a>
+  <a href="index.html" class="cur">🎨 CNN 示範</a>
+</div>
+
 <header>
   <h1>🧠 CNN 互動教學示範</h1>
-  <div class="sub">遙感探測與實習 · 國立中興大學 森林學系 · 大Q · 6 關互動式 CNN 教材</div>
+  <div class="sub">遙感探測與實習 · 國立中興大學 森林學系 · 大Q · 5 關互動式 CNN 教材</div>
   <nav id="lesson-nav"></nav>
 </header>
 
 <main>
   <div class="intro" id="intro">
     <h2>👋 歡迎進入 CNN 世界</h2>
-    <p>這頁是 CNN 的 <strong>6 個互動式教學單元</strong>，包含：</p>
+    <p>這頁是 CNN 的 <strong>5 個互動式教學單元</strong>，包含：</p>
     <ul>
-      <li>🟦 <strong>L1-L3 基礎原理</strong>：Kernel 卷積、Pooling、Tiny CNN — 純手寫可視化，看到每個數字</li>
-      <li>🤖 <strong>L4 影像分類</strong>：TensorFlow.js + MobileNet 真實模型，可上傳自己的圖</li>
-      <li>🎯 <strong>L5 物件偵測</strong>：COCO-SSD 找出圖中的物件 + bbox + IoU 計算</li>
-      <li>🎨 <strong>L6 影像分割</strong>：BodyPix 把每個像素分類 — 語義 vs 實例分割</li>
+      <li>🟦 <strong>L1-L2 基礎原理</strong>：Kernel 卷積、多 Kernel + Pooling — 純手寫可視化，看到每個數字</li>
+      <li>🤖 <strong>L3 影像分類</strong>：TensorFlow.js + MobileNet 真實模型，可上傳自己的圖</li>
+      <li>🎯 <strong>L4 物件偵測</strong>：COCO-SSD 找出圖中的物件 + bbox + IoU 計算</li>
+      <li>🎨 <strong>L5 影像分割</strong>：BodyPix 把每個像素分類 — 語義 vs 實例分割</li>
     </ul>
     <p style="color:#c5b6db">👈 從上方選一關開始</p>
-    <p style="margin-top:20px;font-size:12px;color:#5a5070">L4-L6 需要從 CDN 下載 AI 模型 (5-10 MB 一個)，首次載入會慢，請耐心等待。</p>
+    <p style="margin-top:20px;font-size:12px;color:#5a5070">L3-L5 需要從 CDN 下載 AI 模型 (5-10 MB 一個)，首次載入會慢，請耐心等待。</p>
   </div>
 
   <!-- ========== L1 Kernel & 卷積 ========== -->
@@ -112,7 +126,17 @@ footer { text-align: center; padding: 20px; color: #5a5070; font-size: 12px; bor
       <div class="desc">9 格自由編輯。原圖是合成「圓+方+線」測試圖。</div>
       <div class="layout">
         <div class="panel">
-          <div class="kgrid">${Array(9).fill(0).map((_,i)=>`<input type="number" step="any" value="0" id="L1K${i}">`).join('')}</div>
+          <div class="kgrid">
+            <input type="number" step="any" value="0" id="L1K0">
+            <input type="number" step="any" value="0" id="L1K1">
+            <input type="number" step="any" value="0" id="L1K2">
+            <input type="number" step="any" value="0" id="L1K3">
+            <input type="number" step="any" value="0" id="L1K4">
+            <input type="number" step="any" value="0" id="L1K5">
+            <input type="number" step="any" value="0" id="L1K6">
+            <input type="number" step="any" value="0" id="L1K7">
+            <input type="number" step="any" value="0" id="L1K8">
+          </div>
           <label style="margin-top:10px">Divisor <span class="val" id="L1Dv">1</span></label>
           <input type="range" id="L1D" min="1" max="20" value="1">
           <label>Bias <span class="val" id="L1Bv">0</span></label>
@@ -165,41 +189,9 @@ footer { text-align: center; padding: 20px; color: #5a5070; font-size: 12px; bor
     <div class="cta-bar">📌 練熟後 → 去 <a href="../index.html" target="_blank">CNN 請作答 L2</a> 闖關</div>
   </div>
 
-  <!-- ========== L3 Tiny CNN ========== -->
+  <!-- ========== L3 (原 L4) MobileNet 分類 ========== -->
   <div class="lesson" data-lv="3">
-    <h2>🟪 L3 — Tiny CNN 權重傳遞</h2>
-    <div class="lv-meta"><span class="tag">6 分鐘</span> · 練習：6 個樣本即時推論</div>
-    <div class="theory"><h4>📖 觀念</h4>
-      <p>完整 CNN 管線：Input(8×8) → Conv(2 kernels 3×3) → ReLU → MaxPool 2×2 → Flatten → Dense(2 outputs) → 分類</p></div>
-    <div class="step"><span class="num">1</span><span class="title">看 6 個樣本</span><div class="act">3 個 X、3 個 O 的 8×8 二值圖。每個都即時跑過 CNN 顯示分類結果。</div></div>
-    <div class="step"><span class="num">2</span><span class="title">調 bias 看影響</span><div class="act">把 biasX 調很高，所有樣本都會被分類成 X（不論真實標籤）。再復原。</div></div>
-    <div class="step"><span class="num">3</span><span class="title">理解 logit</span><div class="act">每個樣本下方有 logit_X 和 logit_O 數值。哪個大就分到哪類。</div></div>
-    <div class="practice">
-      <h3>🎮 互動練習</h3>
-      <div class="desc">6 個樣本即時推論。調 bias 看哪些樣本分類會變。</div>
-      <div class="layout">
-        <div class="panel">
-          <label>biasX <span class="val" id="L3Bxv">0</span></label>
-          <input type="range" id="L3Bx" min="-100" max="100" value="0">
-          <label>biasO <span class="val" id="L3Bov">0</span></label>
-          <input type="range" id="L3Bo" min="-100" max="100" value="0">
-          <button class="btn" onclick="L3Reset()" style="width:100%;margin-top:10px">🔄 都歸零</button>
-          <div style="margin-top:14px;font-size:11px;color:#8a8aa5">
-            分類邏輯：<br>
-            logit_X = sumK1 - sumK2 + biasX<br>
-            logit_O = sumK2 - sumK1 + biasO<br>
-            argmax → 分類
-          </div>
-        </div>
-        <div id="L3Out" style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px"></div>
-      </div>
-    </div>
-    <div class="cta-bar">📌 練熟後 → 去 <a href="../index.html" target="_blank">CNN 請作答 L3</a> 闖關</div>
-  </div>
-
-  <!-- ========== L4 MobileNet 分類 ========== -->
-  <div class="lesson" data-lv="4">
-    <h2>🤖 L4 — 影像分類 (MobileNet)</h2>
+    <h2>🤖 L3 — 影像分類 (MobileNet)</h2>
     <div class="lv-meta"><span class="tag">5 分鐘 + 模型下載</span> · 練習：點圖看預測 / 上傳自己的圖</div>
     <div class="theory"><h4>📖 觀念</h4>
       <p><strong>MobileNet</strong> 是訓練好的真實 CNN 模型，能辨識 1000 個 ImageNet 類別（動物、物品、景物）。直接在你的瀏覽器執行，不需後端。</p></div>
@@ -229,12 +221,12 @@ footer { text-align: center; padding: 20px; color: #5a5070; font-size: 12px; bor
         </div>
       </div>
     </div>
-    <div class="cta-bar">📌 練熟後 → 去 <a href="../index.html" target="_blank">CNN 請作答 L4</a> 闖關</div>
+    <div class="cta-bar">📌 練熟後 → 去 <a href="../index.html" target="_blank">CNN 請作答 L3</a> 闖關</div>
   </div>
 
-  <!-- ========== L5 COCO-SSD 物件偵測 ========== -->
-  <div class="lesson" data-lv="5">
-    <h2>🎯 L5 — 物件偵測 (COCO-SSD)</h2>
+  <!-- ========== L4 (原 L5) COCO-SSD 物件偵測 ========== -->
+  <div class="lesson" data-lv="4">
+    <h2>🎯 L4 — 物件偵測 (COCO-SSD)</h2>
     <div class="lv-meta"><span class="tag">6 分鐘 + 模型下載</span> · 練習：偵測 80 類物件 + IoU 計算</div>
     <div class="theory"><h4>📖 觀念</h4>
       <p><strong>COCO-SSD</strong> 不只說「圖中有什麼」，還要框出位置 (bounding box) + 類別 + 信心。能識別 80 類常見物件（人、車、動物、傢俱…）。</p>
@@ -256,8 +248,9 @@ footer { text-align: center; padding: 20px; color: #5a5070; font-size: 12px; bor
               <div>📷 上傳你的圖</div>
               <input type="file" id="L5Upload" accept="image/*" onchange="L5UploadHandler(event)">
             </label>
-            <div style="font-weight:bold;color:#c5b6db;margin:14px 0 6px 0">或選內建</div>
+            <div style="font-weight:bold;color:#c5b6db;margin:14px 0 6px 0">或點內建測試圖</div>
             <div class="sample-grid" id="L5Gallery"></div>
+            <div style="font-size:11px;color:#8a8aa5;margin-top:8px">⚠ COCO-SSD 只認識 80 類常見物件（人/車/狗/桌椅…）。風景/圖案測不出結果是正常的。</div>
           </div>
           <div>
             <div class="canvas-wrap"><canvas id="L5Canvas" width="480" height="360" style="width:100%;max-width:480px"></canvas></div>
@@ -281,12 +274,12 @@ footer { text-align: center; padding: 20px; color: #5a5070; font-size: 12px; bor
         </div>
       </div>
     </div>
-    <div class="cta-bar">📌 練熟後 → 去 <a href="../index.html" target="_blank">CNN 請作答 L5</a> 闖關</div>
+    <div class="cta-bar">📌 練熟後 → 去 <a href="../index.html" target="_blank">CNN 請作答 L4</a> 闖關</div>
   </div>
 
-  <!-- ========== L6 影像分割 ========== -->
-  <div class="lesson" data-lv="6">
-    <h2>🎨 L6 — 影像分割 (BodyPix)</h2>
+  <!-- ========== L5 (原 L6) 影像分割 ========== -->
+  <div class="lesson" data-lv="5">
+    <h2>🎨 L5 — 影像分割 (BodyPix)</h2>
     <div class="lv-meta"><span class="tag">5 分鐘 + 模型下載</span> · 練習：人像語義分割 + 實例概念</div>
     <div class="theory"><h4>📖 觀念</h4>
       <p><strong>影像分割</strong>：把<u>每一個像素</u>都分類，不只框出物件。</p>
@@ -330,7 +323,7 @@ footer { text-align: center; padding: 20px; color: #5a5070; font-size: 12px; bor
         </div>
       </div>
     </div>
-    <div class="cta-bar">📌 這是新主題！CNN 請作答暫無 L6 對應（你可建議大Q補上）</div>
+    <div class="cta-bar">📌 完成所有教學示範！可回 <a href="../index.html" target="_blank">CNN 請作答</a> 挑戰看看</div>
   </div>
 </main>
 
@@ -340,17 +333,17 @@ footer { text-align: center; padding: 20px; color: #5a5070; font-size: 12px; bor
 // ============================================================
 // 導航
 // ============================================================
-const titles = ['🏠 簡介','🟦 L1 Kernel','🟧 L2 多Kernel+Pool','🟪 L3 Tiny CNN','🤖 L4 分類','🎯 L5 偵測','🎨 L6 分割'];
+const titles = ['🏠 簡介','🟦 L1 Kernel','🟧 L2 多Kernel+Pool','🤖 L3 分類','🎯 L4 偵測','🎨 L5 分割'];
 document.getElementById('lesson-nav').innerHTML = titles.map((t,i) => `<a class="${i===0?'active':''}" data-i="${i}" onclick="navTo(${i})">${t}</a>`).join('');
 function navTo(i) {
-  document.querySelectorAll('nav a').forEach((a,j) => a.classList.toggle('active', j===i));
+  document.querySelectorAll('#lesson-nav a').forEach((a,j) => a.classList.toggle('active', j===i));
   document.getElementById('intro').style.display = i===0 ? 'block' : 'none';
   document.querySelectorAll('.lesson').forEach((l, j) => l.classList.toggle('active', j === i-1));
   window.scrollTo({top:0, behavior:'smooth'});
-  // Lazy-load TFJS lessons
-  if (i === 4 && !window._L4loaded) initL4();
-  if (i === 5 && !window._L5loaded) initL5();
-  if (i === 6 && !window._L6loaded) initL6();
+  // Lazy-load TFJS lessons (L3=MobileNet, L4=COCO-SSD, L5=BodyPix)
+  if (i === 3 && !window._L4loaded) initL4();
+  if (i === 4 && !window._L5loaded) initL5();
+  if (i === 5 && !window._L6loaded) initL6();
 }
 
 // ============================================================
@@ -484,78 +477,23 @@ function L2Run() {
   const psize = parseInt(document.getElementById('L2P').value);
   const ptype = document.getElementById('L2Pt').value;
   let html = '';
-  for (const ker of kernels) {
-    const feat = convolve2d(_L2in, 64, 64, ker.k, 3, ker.d, ker.b);
-    const pool = ptype === 'max' ? maxPool2d(feat, 64, 64, psize) : avgPool2d(feat, 64, 64, psize);
+  kernels.forEach((ker, i) => {
+    const pool = ptype === 'max' ? maxPool2d(new Float32Array(64*64), 64, 64, psize) : avgPool2d(new Float32Array(64*64), 64, 64, psize);
     html += `<div style="background:#0f0f24;padding:10px;border-radius:6px;display:grid;grid-template-columns:1fr 1fr;gap:6px">
       <div style="grid-column:1/-1;font-size:11px;color:#c5b6db;font-weight:bold">${ker.name}</div>
-      <div><canvas width="64" height="64" id="L2F${ker.name}" style="width:110px;height:110px;image-rendering:pixelated"></canvas><div style="font-size:10px;color:#8a8aa5;text-align:center">Feature map 64×64</div></div>
-      <div><canvas width="${pool.w}" height="${pool.h}" id="L2P${ker.name}" style="width:110px;height:110px;image-rendering:pixelated"></canvas><div style="font-size:10px;color:#8a8aa5;text-align:center">Pool ${pool.w}×${pool.h}</div></div>
+      <div><canvas width="64" height="64" id="L2F${i}" style="width:110px;height:110px;image-rendering:pixelated"></canvas><div style="font-size:10px;color:#8a8aa5;text-align:center">Feature map 64×64</div></div>
+      <div><canvas width="${pool.w}" height="${pool.h}" id="L2P${i}" style="width:110px;height:110px;image-rendering:pixelated"></canvas><div style="font-size:10px;color:#8a8aa5;text-align:center">Pool ${pool.w}×${pool.h}</div></div>
     </div>`;
-  }
+  });
   document.getElementById('L2Out').innerHTML = html;
-  for (const ker of kernels) {
+  kernels.forEach((ker, i) => {
     const feat = convolve2d(_L2in, 64, 64, ker.k, 3, ker.d, ker.b);
     const pool = ptype === 'max' ? maxPool2d(feat, 64, 64, psize) : avgPool2d(feat, 64, 64, psize);
-    document.getElementById('L2F'+ker.name).getContext('2d').putImageData(floatToImd(feat, 64, 64, 0, 255), 0, 0);
-    document.getElementById('L2P'+ker.name).getContext('2d').putImageData(floatToImd(pool.data, pool.w, pool.h, 0, 255), 0, 0);
-  }
-}
-
-// ============================================================
-// L3 Tiny CNN
-// ============================================================
-const L3_SAMPLES = [
-  { label:'X', d:[1,0,0,0,0,0,0,1, 0,1,0,0,0,0,1,0, 0,0,1,0,0,1,0,0, 0,0,0,1,1,0,0,0, 0,0,0,1,1,0,0,0, 0,0,1,0,0,1,0,0, 0,1,0,0,0,0,1,0, 1,0,0,0,0,0,0,1] },
-  { label:'X', d:[0,1,0,0,0,0,1,0, 0,0,1,0,0,1,0,0, 0,0,0,1,1,0,0,0, 0,0,0,1,1,0,0,0, 0,0,1,0,0,1,0,0, 0,1,0,0,0,0,1,0, 1,0,0,0,0,0,0,1, 0,0,0,0,0,0,0,0] },
-  { label:'X', d:[1,1,0,0,0,0,1,1, 1,1,0,0,0,1,1,0, 0,0,1,0,0,1,0,0, 0,0,0,1,1,0,0,0, 0,0,0,1,1,0,0,0, 0,0,1,0,0,1,0,0, 0,1,1,0,0,0,1,1, 1,1,0,0,0,0,1,1] },
-  { label:'O', d:[0,1,1,1,1,1,1,0, 1,0,0,0,0,0,0,1, 1,0,0,0,0,0,0,1, 1,0,0,0,0,0,0,1, 1,0,0,0,0,0,0,1, 1,0,0,0,0,0,0,1, 1,0,0,0,0,0,0,1, 0,1,1,1,1,1,1,0] },
-  { label:'O', d:[0,0,1,1,1,1,0,0, 0,1,0,0,0,0,1,0, 1,0,0,0,0,0,0,1, 1,0,0,0,0,0,0,1, 1,0,0,0,0,0,0,1, 1,0,0,0,0,0,0,1, 0,1,0,0,0,0,1,0, 0,0,1,1,1,1,0,0] },
-  { label:'O', d:[1,1,1,1,1,1,1,1, 1,0,0,0,0,0,0,1, 1,0,0,0,0,0,0,1, 1,0,0,0,0,0,0,1, 1,0,0,0,0,0,0,1, 1,0,0,0,0,0,0,1, 1,0,0,0,0,0,0,1, 1,1,1,1,1,1,1,1] }
-];
-const L3_K = [
-  [1,-1,1, -1,2,-1, 1,-1,1],   // K1: X 對角
-  [-1,1,-1, 1,-1,1, -1,1,-1]   // K2: O 環形
-];
-function initL3() {
-  document.getElementById('L3Bx').addEventListener('input', e => { document.getElementById('L3Bxv').textContent = e.target.value; L3Run(); });
-  document.getElementById('L3Bo').addEventListener('input', e => { document.getElementById('L3Bov').textContent = e.target.value; L3Run(); });
-  L3Run();
-}
-function L3Reset() {
-  document.getElementById('L3Bx').value = 0; document.getElementById('L3Bxv').textContent = 0;
-  document.getElementById('L3Bo').value = 0; document.getElementById('L3Bov').textContent = 0;
-  L3Run();
-}
-function L3Run() {
-  const bx = parseInt(document.getElementById('L3Bx').value);
-  const bo = parseInt(document.getElementById('L3Bo').value);
-  let html = '';
-  for (const s of L3_SAMPLES) {
-    const input = new Float32Array(s.d);
-    const f1 = relu(convolve2d(input, 8, 8, L3_K[0], 3, 1, 0));
-    const f2 = relu(convolve2d(input, 8, 8, L3_K[1], 3, 1, 0));
-    const p1 = maxPool2d(f1, 8, 8, 2);
-    const p2 = maxPool2d(f2, 8, 8, 2);
-    let sumK1 = 0; for (let i = 0; i < p1.data.length; i++) sumK1 += p1.data[i];
-    let sumK2 = 0; for (let i = 0; i < p2.data.length; i++) sumK2 += p2.data[i];
-    const lx = sumK1 - sumK2 + bx;
-    const lo = sumK2 - sumK1 + bo;
-    const pred = lx > lo ? 'X' : 'O';
-    const ok = pred === s.label;
-    let grid = `<div style="display:grid;grid-template-columns:repeat(8,10px);gap:0;background:#3a2a4a;padding:1px">`;
-    for (const v of s.d) grid += `<div style="width:10px;height:10px;background:${v?'#fff':'#1a1530'}"></div>`;
-    grid += '</div>';
-    html += `<div style="background:#0f0f24;border-radius:6px;padding:10px;border-left:3px solid ${ok?'#4ab87e':'#b85a4a'}">
-      <div style="display:flex;gap:10px;align-items:center">${grid}
-      <div style="font-size:11px;font-family:monospace">
-        <div>真實 <strong>${s.label}</strong></div>
-        <div>預測 <strong style="color:${ok?'#4ab87e':'#b85a4a'}">${pred}</strong></div>
-        <div>logit_X = ${lx.toFixed(0)}</div>
-        <div>logit_O = ${lo.toFixed(0)}</div>
-      </div></div></div>`;
-  }
-  document.getElementById('L3Out').innerHTML = html;
+    document.getElementById('L2F'+i).getContext('2d').putImageData(floatToImd(feat, 64, 64, 0, 255), 0, 0);
+    const pc = document.getElementById('L2P'+i);
+    pc.width = pool.w; pc.height = pool.h;
+    pc.getContext('2d').putImageData(floatToImd(pool.data, pool.w, pool.h, 0, 255), 0, 0);
+  });
 }
 
 // ============================================================
@@ -674,14 +612,35 @@ async function initL5() {
     };
     iouC.onmouseup = iouC.onmouseleave = () => { window._L5iou.dragging = null; };
     drawIou();
-    // Built-in samples
+    // Built-in samples — 真實照片才測得到 COCO 80 類，用 TF.js 官方測試圖
     const gallery = document.getElementById('L5Gallery');
-    ['cityscape','forest','beach'].forEach(s => {
-      const c = document.createElement('canvas');
-      c.width = 480; c.height = 360; drawScene(c, s);
-      c.style.cssText = 'width:100%;cursor:pointer;border-radius:4px;border:2px solid #3a2a4a';
-      c.onclick = () => L5DetectCanvas(c);
-      gallery.appendChild(c);
+    const SAMPLES = [
+      { url: 'https://storage.googleapis.com/tfjs-examples/simple-object-detection/dist/image1.jpg', label: '人 + 桌子' },
+      { url: 'https://images.unsplash.com/photo-1502720433255-614171a1835e?w=480&auto=format', label: '街景' },
+      { url: 'https://images.unsplash.com/photo-1543466835-00a7907e9de1?w=480&auto=format', label: '狗' }
+    ];
+    SAMPLES.forEach(sm => {
+      const wrap = document.createElement('div');
+      wrap.style.cssText = 'position:relative;cursor:pointer;border-radius:4px;overflow:hidden;border:2px solid #3a2a4a';
+      const img = new Image();
+      img.crossOrigin = 'anonymous';
+      img.style.cssText = 'width:100%;display:block';
+      img.onload = () => {
+        wrap.onclick = () => {
+          const c = document.createElement('canvas');
+          c.width = img.naturalWidth; c.height = img.naturalHeight;
+          c.getContext('2d').drawImage(img, 0, 0);
+          L5DetectCanvas(c);
+        };
+      };
+      img.onerror = () => { wrap.innerHTML = `<div style="padding:30px;background:#2a1a3a;color:#8a8aa5;font-size:11px;text-align:center">無法載入<br>${sm.label}</div>`; };
+      img.src = sm.url;
+      wrap.appendChild(img);
+      const cap = document.createElement('div');
+      cap.style.cssText = 'position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,0.6);color:#fff;font-size:11px;padding:3px 6px';
+      cap.textContent = sm.label;
+      wrap.appendChild(cap);
+      gallery.appendChild(wrap);
     });
   } catch (e) {
     document.getElementById('L5Status').innerHTML = '⚠ 載入失敗：' + e.message;
@@ -908,8 +867,8 @@ function hslToRgb(h, s, l) {
   return [Math.round(r*255), Math.round(g*255), Math.round(b*255)];
 }
 
-// 啟動 L1-L3（不需 TFJS）
-window.addEventListener('load', () => { initL1(); initL2(); initL3(); });
+// 啟動 L1-L2（不需 TFJS）
+window.addEventListener('load', () => { initL1(); initL2(); });
 </script>
 
 </body>

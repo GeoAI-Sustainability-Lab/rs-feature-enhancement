@@ -1,9 +1,9 @@
 // ============================================================
-// CNN 闖關 5 關定義
+// CNN 闖關 4 關定義（已移除原 L3 Tiny CNN，剩 Kernel / Pool 計算 / 分類 / 偵測）
 // ============================================================
 
 function defineLevels() {
-  LEVEL_DEFS.push(LEVEL_1, LEVEL_2, LEVEL_3, LEVEL_4, LEVEL_5);
+  LEVEL_DEFS.push(LEVEL_1, LEVEL_2, LEVEL_4, LEVEL_5);
 }
 
 // ============================================================
@@ -46,7 +46,7 @@ function makeTestImage(w, h, kind) {
 const LEVEL_1 = {
   icon: '🟦',
   title: 'Kernel & 卷積',
-  passThreshold: 80,
+  passThreshold: 65,
   theory: `
     <p><strong>卷積（Convolution）</strong>是 CNN 的基礎運算：用一個小型矩陣（<strong>kernel</strong> / 濾波核）在影像上「滑動」，每個位置都計算 kernel 與該位置周圍像素的<strong>加權總和</strong>，作為輸出像素。</p>
     <p>例如 3×3 kernel：</p>
@@ -195,7 +195,7 @@ const FIXED_KERNELS_L2 = {
 const LEVEL_2 = {
   icon: '🟧',
   title: '多 Kernel + Pooling',
-  passThreshold: 80,
+  passThreshold: 65,
   theory: `
     <p>真實的 CNN 在一層中會用<strong>多個 kernel 並行</strong>，每個 kernel 提取不同特徵，產生多張 <strong>feature maps</strong>。</p>
     <p><strong>Pooling</strong>：降低 feature map 解析度，減少參數、增加抗位移性。</p>
@@ -253,10 +253,15 @@ const LEVEL_2 = {
   },
   computeScore: function() {
     // 輸入 32x32, kernel 5x5, stride 2, padding 1
-    // conv output = floor((32 + 2*1 - 5)/2) + 1 = floor(29/2)+1 = 14+1 = 15
+    // conv output = floor((32 + 2*1 - 5)/2) + 1 = 15
     // pool 2x2: floor(15/2) = 7
     const ans = parseInt(document.getElementById('L2Ans').value);
-    return ans === 7 ? 100 : 0;
+    if (isNaN(ans)) return 0;
+    const diff = Math.abs(ans - 7);
+    if (diff === 0) return 100;
+    if (diff === 1) return 75;  // 差 1 (例如忘了 floor) 還是給通關
+    if (diff <= 3) return 40;
+    return 0;
   }
 };
 function L2Compute() {
@@ -276,140 +281,6 @@ function L2Compute() {
   document.getElementById('L2PoolSize').textContent = `${pooled.w}×${pooled.h}`;
 }
 
-// ============================================================
-// L3 — Tiny CNN 權重傳遞
-// ============================================================
-const L3_SAMPLES = {
-  X: [
-    [1,0,0,0,0,0,0,1, 0,1,0,0,0,0,1,0, 0,0,1,0,0,1,0,0, 0,0,0,1,1,0,0,0,
-     0,0,0,1,1,0,0,0, 0,0,1,0,0,1,0,0, 0,1,0,0,0,0,1,0, 1,0,0,0,0,0,0,1],
-    [0,1,0,0,0,0,1,0, 0,0,1,0,0,1,0,0, 0,0,0,1,1,0,0,0, 0,0,0,1,1,0,0,0,
-     0,0,1,0,0,1,0,0, 0,1,0,0,0,0,1,0, 1,0,0,0,0,0,0,1, 0,0,0,0,0,0,0,0]
-  ],
-  O: [
-    [0,1,1,1,1,1,1,0, 1,0,0,0,0,0,0,1, 1,0,0,0,0,0,0,1, 1,0,0,0,0,0,0,1,
-     1,0,0,0,0,0,0,1, 1,0,0,0,0,0,0,1, 1,0,0,0,0,0,0,1, 0,1,1,1,1,1,1,0],
-    [0,0,1,1,1,1,0,0, 0,1,0,0,0,0,1,0, 1,0,0,0,0,0,0,1, 1,0,0,0,0,0,0,1,
-     1,0,0,0,0,0,0,1, 1,0,0,0,0,0,0,1, 0,1,0,0,0,0,1,0, 0,0,1,1,1,1,0,0]
-  ]
-};
-// 固定的兩個 conv kernels (X-like / O-like)
-const L3_CONV_KERNELS = [
-  // K1: 偵測對角線（X 特徵）
-  [1,-1,1, -1,2,-1, 1,-1,1],
-  // K2: 偵測圓形邊緣（O 特徵）
-  [-1,1,-1, 1,-1,1, -1,1,-1]
-];
-
-const LEVEL_3 = {
-  icon: '🟪',
-  title: 'Tiny CNN 權重傳遞',
-  passThreshold: 80,
-  theory: `
-    <p>把學到的東西組合：<strong>Conv → ReLU → Pool → Flatten → Dense → 分類</strong></p>
-    <pre style="background:#0a0a18;padding:10px;border-radius:4px;color:#c5b6db;font-size:13px">
-Input(8×8)
-   ↓ Conv (2 個 3×3 kernels)  → 2 張 feature maps (8×8)
-   ↓ ReLU (負值歸零)
-   ↓ MaxPool 2×2              → 2 張 4×4
-   ↓ Flatten                  → 32 個數字
-   ↓ Dense (32 → 2 outputs)   → [logit_X, logit_O]
-   ↓ Argmax                   → 分類結果</pre>
-    <p>本題的 conv kernels 是預設好的（一個偵測 X 對角、一個偵測 O 環形）。
-       你的任務是<strong>調 Dense 層的權重</strong>，讓 4 個測試樣本都正確分類。</p>
-  `,
-  goal: `🎯 調整 Dense 層的<strong>偏向值</strong>（看下面），讓 4 個樣本（2 X + 2 O）都正確分類。
-         <br>4 個都對 = 100 分；任 1 個錯 = 0 分。`,
-  render: function() {
-    const body = document.getElementById('challengeBody');
-    window._L3 = { biasX: 0, biasO: 0 };
-    body.innerHTML = `
-      <div class="layout">
-        <div class="panel">
-          <h4>Dense 層 Bias 調整</h4>
-          <div class="control-row">
-            <label>X 類別 bias <span class="value" id="L3BXV">0</span></label>
-            <input type="range" id="L3BX" min="-100" max="100" value="0">
-          </div>
-          <div class="control-row">
-            <label>O 類別 bias <span class="value" id="L3BOV">0</span></label>
-            <input type="range" id="L3BO" min="-100" max="100" value="0">
-          </div>
-          <div style="font-size:12px;color:#c5b6db;margin-top:8px">
-            分數 = (X-class_logit) - (O-class_logit) + bias[class]<br>
-            argmax 取較大的 logit 作為分類。
-          </div>
-          ${renderSubmitArea(3, true)}
-        </div>
-        <div>
-          <h4 style="margin:0 0 8px 0;color:#b89bdb">Conv Kernels（固定）</h4>
-          <div style="display:flex;gap:20px;margin-bottom:14px">
-            <div><div style="font-size:11px;color:#8a8aa5;margin-bottom:4px">K1 (X 偵測)</div>${renderMatrix(L3_CONV_KERNELS[0], 3, 3, true)}</div>
-            <div><div style="font-size:11px;color:#8a8aa5;margin-bottom:4px">K2 (O 偵測)</div>${renderMatrix(L3_CONV_KERNELS[1], 3, 3, true)}</div>
-          </div>
-          <h4 style="color:#b89bdb">4 個測試樣本（即時推論）</h4>
-          <div id="L3Samples" style="display:grid;grid-template-columns:repeat(2,1fr);gap:10px"></div>
-        </div>
-      </div>`;
-    document.getElementById('L3BX').addEventListener('input', e => { document.getElementById('L3BXV').textContent = e.target.value; window._L3.biasX = parseInt(e.target.value); L3Run(); });
-    document.getElementById('L3BO').addEventListener('input', e => { document.getElementById('L3BOV').textContent = e.target.value; window._L3.biasO = parseInt(e.target.value); L3Run(); });
-    L3Run();
-  },
-  computeScore: function() { return window._L3score || 0; }
-};
-function L3Run() {
-  // 對每個樣本前傳，計算分類
-  const cont = document.getElementById('L3Samples');
-  let correct = 0;
-  let html = '';
-  const allSamples = [
-    ...L3_SAMPLES.X.map(s => ({data: s, label: 'X'})),
-    ...L3_SAMPLES.O.map(s => ({data: s, label: 'O'}))
-  ];
-  for (const sample of allSamples) {
-    const input = new Float32Array(sample.data);
-    const f1 = relu(convolve2d(input, 8, 8, L3_CONV_KERNELS[0], 3, 1, 0));
-    const f2 = relu(convolve2d(input, 8, 8, L3_CONV_KERNELS[1], 3, 1, 0));
-    const p1 = maxPool2d(f1, 8, 8, 2);
-    const p2 = maxPool2d(f2, 8, 8, 2);
-    // logit_X = sum(p1) - sum(p2) + biasX  (簡化：用 sum 代表 feature 強度)
-    let sumK1 = 0; for (let i = 0; i < p1.data.length; i++) sumK1 += p1.data[i];
-    let sumK2 = 0; for (let i = 0; i < p2.data.length; i++) sumK2 += p2.data[i];
-    const logitX = sumK1 - sumK2 + window._L3.biasX;
-    const logitO = sumK2 - sumK1 + window._L3.biasO;
-    const pred = logitX > logitO ? 'X' : 'O';
-    const ok = pred === sample.label;
-    if (ok) correct++;
-    html += `<div style="background:#0f0f24;border-radius:6px;padding:8px;border-left:3px solid ${ok?'#4ab87e':'#b85a4a'}">
-      <div style="display:flex;gap:10px;align-items:center">
-        ${renderBinaryGrid(sample.data, 8, 8)}
-        <div style="font-size:11px;font-family:monospace">
-          <div>真實: <strong>${sample.label}</strong></div>
-          <div>預測: <strong style="color:${ok?'#4ab87e':'#b85a4a'}">${pred}</strong></div>
-          <div>logit_X = ${logitX.toFixed(0)}</div>
-          <div>logit_O = ${logitO.toFixed(0)}</div>
-        </div>
-      </div>
-    </div>`;
-  }
-  cont.innerHTML = html;
-  window._L3score = correct === 4 ? 100 : (correct >= 3 ? 50 : 0);
-  updateLiveScore(3);
-}
-function renderMatrix(arr, w, h, label) {
-  let s = `<div class="matrix-display" style="grid-template-columns:repeat(${w},22px)">`;
-  for (let i = 0; i < arr.length; i++) {
-    const v = arr[i];
-    const bg = v > 0 ? `rgba(74,184,126,${Math.min(1, v/2)})` : v < 0 ? `rgba(184,90,74,${Math.min(1, -v/2)})` : '#1a1a30';
-    s += `<div class="matrix-cell" style="background:${bg};color:#fff">${label ? v.toString() : ''}</div>`;
-  }
-  return s + '</div>';
-}
-function renderBinaryGrid(arr, w, h) {
-  let s = `<div style="display:grid;grid-template-columns:repeat(${w},10px);gap:0;background:#3a2a4a;padding:1px">`;
-  for (const v of arr) s += `<div style="width:10px;height:10px;background:${v ? '#fff' : '#1a1a30'}"></div>`;
-  return s + '</div>';
-}
 
 // ============================================================
 // L4 — 影像分類 (TFJS MobileNet)
@@ -417,14 +288,14 @@ function renderBinaryGrid(arr, w, h) {
 const LEVEL_4 = {
   icon: '🤖',
   title: '影像分類 (TFJS)',
-  passThreshold: 80,
+  passThreshold: 65,
   theory: `
     <p>這一關用 <strong>TensorFlow.js</strong> 載入 <strong>MobileNet v2</strong> — 一個已經訓練好、能辨識 1000 個類別的 CNN 模型。</p>
     <p>輸入一張圖 → 輸出每個類別的機率（前 5 名）。</p>
     <p style="color:#b89bdb">⏳ 首次載入需要 5–15 秒（從 CDN 下載 ~10 MB 模型）。耐心等待 ✨</p>
   `,
-  goal: `🎯 從下面 6 張影像中，找出 <strong>MobileNet 預測前 5 名中包含「tree」或「forest」相關類別、信心 ≥ 0.10</strong> 的那張。
-         <br>點圖片做預測，看到符合的就提交該圖。`,
+  goal: `🎯 從下面 6 張影像中，找出 <strong>MobileNet 預測前 5 名包含自然/植被/山景相關類別</strong>的那張。
+         <br>點圖片做預測，看到符合的就提交。<span style="font-size:11px;color:#8a8aa5">（即使只是相關詞也給 70 分，能通關）</span>`,
   render: function() {
     const body = document.getElementById('challengeBody');
     body.innerHTML = `
@@ -437,7 +308,7 @@ const LEVEL_4 = {
             <h4>選一張圖片做預測</h4>
             <div id="L4Gallery" style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px"></div>
             <div style="margin-top:14px;font-size:12px;color:#8a8aa5">點任一張看 MobileNet 預測前 5 名。挑到符合條件的圖再按提交。</div>
-            ${renderSubmitArea(4, true)}
+            ${renderSubmitArea(3, true)}
           </div>
           <div>
             <div class="canvas-wrap" style="min-height:240px"><canvas id="L4Canvas" width="224" height="224" style="width:224px;height:224px"></canvas></div>
@@ -523,10 +394,11 @@ async function L4Predict(canvas, idx) {
       <span style="width:50px;text-align:right;font-family:monospace;font-size:12px">${(p.probability*100).toFixed(1)}%</span>
     </div>`).join('');
   document.getElementById('L4Preds').innerHTML = `<h4 style="color:#b89bdb">Top-5 預測：</h4>${html}`;
-  // 判定是否符合
-  const hasTree = preds.some(p => /tree|forest|wood|pine|oak|maple/i.test(p.className) && p.probability >= 0.10);
-  window._L4score = hasTree ? 100 : 0;
-  updateLiveScore(4);
+  // 判定是否符合：放寬條件 — 信心 ≥ 0.05 而非 0.10，且接受更多自然類別字
+  const matchesTopic = preds.some(p => /tree|forest|wood|pine|oak|maple|plant|leaf|park|lakeside|seashore|valley|alp|mountain|cliff|hill/i.test(p.className) && p.probability >= 0.05);
+  const partial = preds.some(p => /tree|forest|wood|plant|leaf|park|alp|mountain/i.test(p.className));
+  window._L4score = matchesTopic ? 100 : (partial ? 70 : 0);
+  updateLiveScore(3);
 }
 function loadScript(src) {
   return new Promise((res, rej) => {
@@ -541,7 +413,7 @@ function loadScript(src) {
 const LEVEL_5 = {
   icon: '🎯',
   title: '物件偵測 + IoU',
-  passThreshold: 80,
+  passThreshold: 65,
   theory: `
     <p><strong>物件偵測</strong>：不只說「圖中有狗」，還要框出位置（bounding box）並標記類別。常見模型：COCO-SSD、YOLO、Faster R-CNN。</p>
     <p><strong>IoU (Intersection over Union)</strong>：兩個 bbox 的重疊程度。</p>
@@ -574,7 +446,7 @@ IoU = 1.0  → 完美對齊</pre>
             🟦 藍框 = Ground Truth<br>🟧 橘框 = 你的預測<br>
             按住任一框拖動。目標：IoU ≥ 0.70
           </div>
-          ${renderSubmitArea(5, true)}
+          ${renderSubmitArea(4, true)}
         </div>
         <div>
           <div class="canvas-wrap" style="background:#1a1a30;cursor:move">
@@ -620,7 +492,7 @@ function L5Draw() {
   const iouEl = document.getElementById('L5IoU');
   iouEl.textContent = iou.toFixed(3);
   iouEl.style.color = iou >= 0.70 ? '#4ab87e' : iou >= 0.50 ? '#d4a04a' : '#b85a4a';
-  updateLiveScore(5);
+  updateLiveScore(4);
 }
 function L5MouseDown(e) {
   const r = e.target.getBoundingClientRect(), x = e.clientX - r.left, y = e.clientY - r.top;
@@ -648,3 +520,34 @@ function computeIoU2(a, b) {
   const union = a.w*a.h + b.w*b.h - inter;
   return inter / union;
 }
+
+// ============================================================
+// 提示系統：每 10 分鐘揭露一條，最後一條是正確答案
+// ============================================================
+const LEVEL_HINTS = [
+  // L1 Kernel 與卷積
+  [
+    '目標是「水平邊緣偵測」(Sobel-Y)。觀察目標圖中亮的橫線。',
+    '上下兩列符號相反、中間列為 0。例如 [-1,?,-1, 0,0,0, 1,?,1]。',
+    '✅ 正確答案：Kernel = [-1,-2,-1, 0,0,0, 1,2,1], Divisor=1, Bias=128'
+  ],
+  // L2 多 kernel + Pooling 計算題
+  [
+    '公式：output_size = floor((input + 2×padding − kernel) / stride) + 1',
+    '卷積輸出 = floor((32+2−5)/2)+1 = 15。再 Pool 2×2 → floor(15/2) = ?',
+    '✅ 正確答案：7（卷積後 15×15，再 2×2 max pool 變 7×7）'
+  ],
+  // L3 MobileNet 分類（原 L4）
+  [
+    '點看自然 / 山景 / 樹林類的場景。',
+    '第 2 張（forest 場景，5 棵樹）最容易被辨識為 tree / forest。',
+    '✅ 正確答案：點第 2 張（forest 森林場景）'
+  ],
+  // L4 IoU 物件偵測（原 L5）
+  [
+    '把橘框（你的預測）拖到藍框（GT）上方，越重疊越好。',
+    '兩個框的位置越接近越好。IoU ≥ 0.65 就過關。',
+    '✅ 正確答案：把橘框拖到藍框完全相同位置（IoU 接近 1.0）'
+  ]
+];
+function getLevelHints(n) { return LEVEL_HINTS[n-1] || []; }
