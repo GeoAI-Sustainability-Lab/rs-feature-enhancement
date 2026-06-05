@@ -310,9 +310,24 @@ footer {
 </head>
 <body>
 
+<style>
+.site-nav { background:#0a0a18; padding:8px 16px; font-size:12px; border-bottom:1px solid #3a2a4a; display:flex; gap:6px; flex-wrap:wrap; align-items:center; font-family:"Noto Sans TC","Microsoft JhengHei",sans-serif; }
+.site-nav .lab { color:#8a8aa5; font-weight:bold; margin-right:4px; }
+.site-nav a { color:#c5b6db; text-decoration:none; padding:4px 10px; border-radius:4px; background:rgba(197,182,219,0.08); }
+.site-nav a:hover { background:rgba(197,182,219,0.20); }
+.site-nav a.cur { background:#4ab87e; color:#fff; }
+</style>
+<div class="site-nav">
+  <span class="lab">📚 教材導覽</span>
+  <a href="index.html">🌳 特徵強化請作答</a>
+  <a href="demo/index.html">🎓 特徵強化示範</a>
+  <a href="lab.html" class="cur">🔬 自由探索</a>
+  <a href="cnn/index.html">🧠 CNN 請作答</a>
+  <a href="cnn/demo/index.html">🎨 CNN 示範</a>
+</div>
+
 <header>
   <h1>🎮 練習園地 — 自由探索所有功能</h1>
-  <div style="margin-bottom:10px"><a href="index.html" style="color:#9bd1eb;text-decoration:none;font-size:13px">← 回到闖關模式</a></div>
   <nav>
     <button class="nav-btn active" data-target="home">📖 首頁</button>
     <button class="nav-btn" data-target="ndvi">🌱 植生指標</button>
